@@ -1,7 +1,9 @@
 package main
 
 import (
-	"chuck-jokes/api"
+	"chuck-jokes/cmd"
+
+	"github.com/joho/godotenv"
 )
 
 // Plan to GO
@@ -15,6 +17,9 @@ import (
 //
 
 func main() {
-	server := api.StartEngine()
-	server.Engine.Run(":8080")
+	err := godotenv.Load()
+	if err != nil {
+		panic(err)
+	}
+	cmd.Execute()
 }

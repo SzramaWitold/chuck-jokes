@@ -1,7 +1,7 @@
 package api
 
 import (
-	"chuck-jokes/requests"
+	"chuck-jokes/pkg/requests"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

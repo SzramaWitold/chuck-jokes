@@ -4,15 +4,18 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"os"
 )
 
+// JokeResponse Base joke response from external api
 type JokeResponse struct {
-	Value string
-	Id    string 
+	Value string `faker:"sentence"`
+	ID    string `gorm:"primaryKey" faker:"unique"`
 }
 
+// CallRandom Call ranodm joke from external api
 func CallRandom() JokeResponse {
-	response, err := http.Get("https://api.chucknorris.io/jokes/random")
+	response, err := http.Get(os.Getenv("EXTERNAL_API") + "jokes/random")
 	var joke JokeResponse
 
 	if err != nil {

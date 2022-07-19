@@ -6,7 +6,7 @@ networks:
 services:
   mysql8-service:
     image: mysql:8
-    container_name: mysql-go
+    container_name: chuck_db
     ports:
       - "4307:3306"
     volumes:
