@@ -14,7 +14,7 @@ var createDatabaseCmd = &cobra.Command{
 	Use:   "database:create",
 	Short: "Create new database",
 	Long:  `Create new database based on .env file name`,
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		database.CreateDatabase()
 	},
 }

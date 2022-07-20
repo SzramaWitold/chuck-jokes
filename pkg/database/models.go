@@ -16,10 +16,10 @@ type Joke struct {
 // User gorm model
 type User struct {
 	gorm.Model
-	Name       string `faker:"name"`
-	Username   string `faker:"email,unique"`
-	Password   string `faker:"password"`
-	Favourites []Joke `gorm:"many2many:jokes_users;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Name       string     `faker:"name"`
+	Username   string     `faker:"email,unique"`
+	Password   string     `faker:"password"`
+	Favourites []Joke     `gorm:"many2many:jokes_users;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Categories []Category `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 

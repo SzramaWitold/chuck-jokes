@@ -1,32 +1,38 @@
 package database
 
 import (
+	"chuck-jokes/di"
 	"database/sql"
 	"fmt"
 	"os"
 
-	// required for myslq connection
-	_ "github.com/go-sql-driver/mysql"
-	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
-// DB Initialize FORM database
-var DB *gorm.DB
-
-// GetDNS base on .env file
-func GetDNS() string {
-	dns := fmt.Sprintf(
-		"%v:%v@tcp(%v:%v)/%v?charset=utf8mb4&parseTime=True&loc=Local",
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASSWORD"),
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_PORT"),
-		os.Getenv("DB_NAME"),
-	)
-
-	return dns
+// GORMMigrator use gorm for migrate models
+type GORMMigrator struct {
+	db     *gorm.DB
+	models []interface{}
 }
+
+// MigrateModels migrate GORM models
+func (gm *GORMMigrator) MigrateModels() {
+	err := gm.db.AutoMigrate(gm.models...)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Migration complete")
+}
+
+// NewGORMMigrator Initialize new migrator
+func NewGORMMigrator(db *gorm.DB) *GORMMigrator {
+	return &GORMMigrator{
+		db:     db,
+		models: GetAllModels(),
+	}
+}
+
+var container *di.Container
 
 // CreateDatabase base on .env file
 func CreateDatabase() {
@@ -57,21 +63,12 @@ func CreateDatabase() {
 }
 
 //OpenConnection for database inside DB var
-func OpenConnection() {
-	database, err := gorm.Open(mysql.New(mysql.Config{
-		DSN: GetDNS(),
-	}))
-
-	if err != nil {
-		panic(err)
+func OpenConnection() *gorm.DB {
+	if container == nil {
+		newContainer := di.NewContainer()
+		container = &newContainer
+		fmt.Println("Database connected")
 	}
-	DB = database
-	fmt.Println("Database connected")
-}
 
-// MigrateModels migrate GORM models
-func MigrateModels(models []interface{}) {
-	OpenConnection()
-
-	DB.AutoMigrate(models...)
+	return container.Gorm
 }

@@ -14,7 +14,8 @@ var testCmd = &cobra.Command{
 	Use:   "test",
 	Short: "cmd tests",
 	Long:  `Test work in progress functionality`,
-	Run: func(cmd *cobra.Command, args []string) {
-		database.BaseSeed()
+	Run: func(_ *cobra.Command, _ []string) {
+		seeder := database.NewSeeder(database.OpenConnection())
+		seeder.Seed()
 	},
 }

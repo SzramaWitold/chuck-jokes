@@ -14,7 +14,8 @@ var migrateDatabaseCmd = &cobra.Command{
 	Use:   "database:migrate",
 	Short: "migrate database",
 	Long:  `Migrate database based on database.GetAllModels function`,
-	Run: func(cmd *cobra.Command, args []string) {
-		database.MigrateModels(database.GetAllModels())
+	Run: func(_ *cobra.Command, _ []string) {
+		migrator := database.NewGORMMigrator(database.OpenConnection())
+		migrator.MigrateModels()
 	},
 }

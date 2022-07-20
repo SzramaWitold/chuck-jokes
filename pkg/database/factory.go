@@ -10,7 +10,9 @@ func CreateJoke(joke *Joke) *Joke {
 		joke = new(Joke)
 		faker.FakeData(&joke)
 	}
-	DB.Create(joke)
+	db := OpenConnection()
+	db.Create(joke)
+
 	return joke
 }
 
@@ -22,7 +24,9 @@ func CreateUser(user *User) *User {
 		user.Password = faker.Password()
 		user.Username = faker.Email()
 	}
-	DB.Create(user)
+	db := OpenConnection()
+
+	db.Create(user)
 	return user
 }
 
@@ -37,9 +41,9 @@ func CreateCategory(user *User, category *Category) *Category {
 		category.Name = faker.Name()
 		category.UserID = user.ID
 	}
-	DB.Create(category)
+
+	db := OpenConnection()
+	db.Create(category)
 
 	return category
 }
-
-
