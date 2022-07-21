@@ -38,7 +38,6 @@ type CategoryRequest struct {
 
 // Seed seed database withufake data
 func (s *Seeder) Seed() {
-	OpenConnection()
 	fmt.Println("Seed in progress...")
 	userRequest := UserCreateRequest{
 		amount:     5,

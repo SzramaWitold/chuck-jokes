@@ -12,27 +12,42 @@ import (
 
 // Container for dependencies
 type Container struct {
-	Gorm *gorm.DB
+	gorm *gorm.DB
 }
 
-// NewContainer Create new conatiner with dependencies
-func NewContainer() Container {
-	database, err := gorm.Open(mysql.New(mysql.Config{
-		DSN: getDSN(),
-	}))
+var container = &Container{}
 
-	if err != nil {
-		panic(err)
+// GORM get gorm db connection
+func GORM() *gorm.DB {
+	if container.gorm != nil {
+		return container.gorm
 	}
 
-	return Container{
-		Gorm: database,
+	container.gorm = openConnection()
+
+	return container.gorm
+}
+
+//OpenConnection for database inside DB var
+func openConnection() *gorm.DB {
+	if container.gorm == nil {
+		database, err := gorm.Open(mysql.New(mysql.Config{
+			DSN: getDSN(),
+		}))
+
+		if err != nil {
+			panic(err)
+		}
+		container.gorm = database
+		fmt.Println("Database connected")
 	}
+
+	return container.gorm
 }
 
 // getDSN base on .env file
 func getDSN() string {
-	dns := fmt.Sprintf(
+	return fmt.Sprintf(
 		"%v:%v@tcp(%v:%v)/%v?charset=utf8mb4&parseTime=True&loc=Local",
 		os.Getenv("DB_USER"),
 		os.Getenv("DB_PASSWORD"),
@@ -40,6 +55,4 @@ func getDSN() string {
 		os.Getenv("DB_PORT"),
 		os.Getenv("DB_NAME"),
 	)
-
-	return dns
 }

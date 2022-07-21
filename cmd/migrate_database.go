@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"chuck-jokes/di"
 	"chuck-jokes/pkg/database"
 
 	"github.com/spf13/cobra"
@@ -15,7 +16,7 @@ var migrateDatabaseCmd = &cobra.Command{
 	Short: "migrate database",
 	Long:  `Migrate database based on database.GetAllModels function`,
 	Run: func(_ *cobra.Command, _ []string) {
-		migrator := database.NewGORMMigrator(database.OpenConnection())
+		migrator := database.NewGORMMigrator(di.GORM())
 		migrator.MigrateModels()
 	},
 }

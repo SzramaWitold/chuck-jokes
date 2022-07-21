@@ -1,6 +1,8 @@
 package database
 
 import (
+	"chuck-jokes/di"
+
 	"github.com/bxcodec/faker/v3"
 )
 
@@ -10,7 +12,7 @@ func CreateJoke(joke *Joke) *Joke {
 		joke = new(Joke)
 		faker.FakeData(&joke)
 	}
-	db := OpenConnection()
+	db := di.GORM()
 	db.Create(joke)
 
 	return joke
@@ -24,7 +26,7 @@ func CreateUser(user *User) *User {
 		user.Password = faker.Password()
 		user.Username = faker.Email()
 	}
-	db := OpenConnection()
+	db := di.GORM()
 
 	db.Create(user)
 	return user
@@ -42,7 +44,7 @@ func CreateCategory(user *User, category *Category) *Category {
 		category.UserID = user.ID
 	}
 
-	db := OpenConnection()
+	db := di.GORM()
 	db.Create(category)
 
 	return category

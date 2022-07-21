@@ -1,7 +1,6 @@
 package database
 
 import (
-	"chuck-jokes/di"
 	"database/sql"
 	"fmt"
 	"os"
@@ -32,8 +31,6 @@ func NewGORMMigrator(db *gorm.DB) *GORMMigrator {
 	}
 }
 
-var container *di.Container
-
 // CreateDatabase base on .env file
 func CreateDatabase() {
 	dataSource := fmt.Sprintf("%v:%v@tcp(%v:%v)/",
@@ -60,15 +57,4 @@ func CreateDatabase() {
 	}
 
 	fmt.Println("Database:", os.Getenv("DB_NAME"), "created.")
-}
-
-//OpenConnection for database inside DB var
-func OpenConnection() *gorm.DB {
-	if container == nil {
-		newContainer := di.NewContainer()
-		container = &newContainer
-		fmt.Println("Database connected")
-	}
-
-	return container.Gorm
 }
