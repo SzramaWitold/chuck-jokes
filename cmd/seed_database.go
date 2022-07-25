@@ -12,9 +12,9 @@ func init() {
 }
 
 var testCmd = &cobra.Command{
-	Use:   "test",
-	Short: "cmd tests",
-	Long:  `Test work in progress functionality`,
+	Use:   "database:seed",
+	Short: "seed database with fake data",
+	Long:  `Seed data based on fake models from database`,
 	Run: func(_ *cobra.Command, _ []string) {
 		seeder := database.NewSeeder(di.GORM())
 		seeder.Seed()

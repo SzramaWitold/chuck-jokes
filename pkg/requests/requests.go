@@ -2,6 +2,7 @@ package requests
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -28,5 +29,6 @@ func CallRandom() JokeResponse {
 	}
 
 	json.Unmarshal(body, &joke)
+	fmt.Println(joke)
 	return joke
 }
