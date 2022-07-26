@@ -26,6 +26,7 @@ func CreateUser(user *User) *User {
 		user.Password = faker.Password()
 		user.Username = faker.Email()
 	}
+
 	db := di.GORM()
 
 	db.Create(user)

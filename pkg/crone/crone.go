@@ -2,6 +2,7 @@ package crone
 
 import (
 	"chuck-jokes/pkg/database"
+	"chuck-jokes/pkg/repositories"
 	"chuck-jokes/pkg/requests"
 	"fmt"
 	"time"
@@ -15,6 +16,7 @@ var scheduler *gocron.Scheduler
 func GetScheduler() *gocron.Scheduler {
 	if scheduler == nil {
 		scheduler = gocron.NewScheduler(time.UTC)
+		fmt.Println("Scheduler created")
 	}
 
 	return scheduler
@@ -22,6 +24,12 @@ func GetScheduler() *gocron.Scheduler {
 
 func scheduleRandomJoke() {
 	joke := requests.CallRandom()
+	dbJoke := database.Joke{JokeResponse: joke}
+
+	if repositories.JokeExistInLastMonth(&dbJoke) {
+		scheduleRandomJoke()
+	}
+
 	database.CreateJoke(&database.Joke{JokeResponse: joke})
 	fmt.Println("Scheduler runed")
 }

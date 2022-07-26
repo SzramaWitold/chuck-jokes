@@ -7,10 +7,10 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(scheduler)
+	rootCmd.AddCommand(schedulerCmd)
 }
 
-var scheduler = &cobra.Command{
+var schedulerCmd = &cobra.Command{
 	Use:   "schedule:run",
 	Short: "schedul all job inside crone",
 	Long:  `Schedule everything inside crone package`,

@@ -2,7 +2,6 @@ package requests
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -18,7 +17,6 @@ type JokeResponse struct {
 func CallRandom() JokeResponse {
 	response, err := http.Get(os.Getenv("EXTERNAL_API") + "jokes/random")
 	var joke JokeResponse
-
 	if err != nil {
 		panic(err)
 	}
@@ -29,6 +27,6 @@ func CallRandom() JokeResponse {
 	}
 
 	json.Unmarshal(body, &joke)
-	fmt.Println(joke)
+
 	return joke
 }

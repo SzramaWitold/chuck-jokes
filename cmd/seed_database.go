@@ -8,10 +8,10 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(testCmd)
+	rootCmd.AddCommand(seedCmd)
 }
 
-var testCmd = &cobra.Command{
+var seedCmd = &cobra.Command{
 	Use:   "database:seed",
 	Short: "seed database with fake data",
 	Long:  `Seed data based on fake models from database`,

@@ -19,11 +19,9 @@ var container = &Container{}
 
 // GORM get gorm db connection
 func GORM() *gorm.DB {
-	if container.gorm != nil {
-		return container.gorm
+	if container.gorm == nil {
+		container.gorm = openConnection()
 	}
-
-	container.gorm = openConnection()
 
 	return container.gorm
 }
