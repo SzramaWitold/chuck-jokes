@@ -2,9 +2,18 @@ package database
 
 import (
 	"chuck-jokes/di"
+	"gorm.io/gorm"
 
 	"github.com/bxcodec/faker/v3"
 )
+
+type JokeFactory struct {
+	gorm *gorm.DB
+}
+
+func NewJokeFactory(gorm *gorm.DB) *JokeFactory {
+	return &JokeFactory{gorm: gorm}
+}
 
 // CreateJoke add fake Joke model to database
 func CreateJoke(joke *Joke) *Joke {

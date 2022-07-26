@@ -1,7 +1,6 @@
 package database
 
 import (
-	"chuck-jokes/pkg/requests"
 	"time"
 
 	"gorm.io/gorm"
@@ -9,7 +8,8 @@ import (
 
 // Joke gorm model
 type Joke struct {
-	requests.JokeResponse
+	Value     string `faker:"sentence"`
+	ID        string `gorm:"primaryKey" faker:"unique"`
 	CreatedAt time.Time
 }
 

@@ -5,21 +5,15 @@ import (
 	"chuck-jokes/pkg/repositories"
 	"chuck-jokes/pkg/requests"
 	"fmt"
-	"time"
-
 	"github.com/go-co-op/gocron"
 )
 
-var scheduler *gocron.Scheduler
+type CronScheduler struct {
+	scheduler *gocron.Scheduler
+}
 
-// GetScheduler or create new scheduler
-func GetScheduler() *gocron.Scheduler {
-	if scheduler == nil {
-		scheduler = gocron.NewScheduler(time.UTC)
-		fmt.Println("Scheduler created")
-	}
-
-	return scheduler
+func NewCronScheduler(scheduler *gocron.Scheduler) *CronScheduler {
+	return &CronScheduler{scheduler: scheduler}
 }
 
 func scheduleRandomJoke() {
@@ -35,13 +29,12 @@ func scheduleRandomJoke() {
 }
 
 // Schedule all
-func Schedule(async bool) {
-	GetScheduler().Every(1).Minute().Do(scheduleRandomJoke)
+func (s *CronScheduler) Schedule(async bool) {
+	s.scheduler.Every(1).Minute().Do(scheduleRandomJoke)
 
 	if async {
-		GetScheduler().StartAsync()
+		s.scheduler.StartAsync()
 	} else {
-		GetScheduler().StartBlocking()
+		s.scheduler.StartBlocking()
 	}
-
 }

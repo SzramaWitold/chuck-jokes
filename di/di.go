@@ -1,8 +1,11 @@
 package di
 
 import (
+	"chuck-jokes/pkg/crone"
 	"fmt"
+	"github.com/go-co-op/gocron"
 	"os"
+	"time"
 
 	// required for myslq connection
 	_ "github.com/go-sql-driver/mysql"
@@ -12,7 +15,8 @@ import (
 
 // Container for dependencies
 type Container struct {
-	gorm *gorm.DB
+	gorm      *gorm.DB
+	scheduler *gocron.Scheduler
 }
 
 var container = &Container{}
@@ -53,4 +57,17 @@ func getDSN() string {
 		os.Getenv("DB_PORT"),
 		os.Getenv("DB_NAME"),
 	)
+}
+
+func Scheduler() *gocron.Scheduler {
+	if container.scheduler == nil {
+		container.scheduler = gocron.NewScheduler(time.UTC)
+		fmt.Println("Scheduler created")
+	}
+
+	return container.scheduler
+}
+
+func CronScheduler() *crone.CronScheduler {
+	return crone.NewCronScheduler(Scheduler())
 }

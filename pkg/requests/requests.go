@@ -1,16 +1,18 @@
 package requests
 
 import (
+	"chuck-jokes/pkg/database"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"os"
 )
 
+//error shadowing, unmarshal unhandled error,
+
 // JokeResponse Base joke response from external api
 type JokeResponse struct {
-	Value string `faker:"sentence"`
-	ID    string `gorm:"primaryKey" faker:"unique"`
+	database.Joke
 }
 
 // CallRandom Call ranodm joke from external api
