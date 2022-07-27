@@ -1,46 +1,57 @@
 package repositories
 
 import (
-	"chuck-jokes/di"
-	"chuck-jokes/pkg/database"
-	"fmt"
+	gormModels "chuck-jokes/pkg/database/models/gorm"
+	"log"
 	"time"
+
+	"gorm.io/gorm"
 )
 
-// JokeOfTheDay get joke of the day from specyfi day
-func JokeOfTheDay(time string) *database.Joke {
-	db := di.GORM()
-	var joke = database.Joke{}
-	db.Where("created_at >= ?", time).First(&joke)
+// JokeRepository base joke repository
+type JokeRepository struct {
+	db *gorm.DB
+}
 
-	if joke.ID == "" {
+// NewJokeRepository create new joke repository
+func NewJokeRepository(db *gorm.DB) *JokeRepository {
+	return &JokeRepository{
+		db: db,
+	}
+}
+
+// JokeOfTheDay get joke of the day from specyfi day
+func (j *JokeRepository) JokeOfTheDay(time string) *gormModels.Joke {
+	var joke = gormModels.Joke{}
+	j.db.Where("created_at >= ?", time).First(&joke)
+
+	if joke.ExternalID == "" {
 		return nil
 	}
 	return &joke
 }
 
 // GetJokes get all jokes
-func GetJokes(page, perPage int) *Pagination {
-	db := di.GORM()
+func (j *JokeRepository) GetJokes(page, perPage int) *Pagination {
 	var totalRows int64
-	var jokes = []database.Joke{}
+	var jokes = []gormModels.Joke{}
 	var pagination = Pagination{}
 	
-	db.Model([]database.Joke{}).Count(&totalRows)
+	j.db.Model([]gormModels.Joke{}).Count(&totalRows)
 	pagination.UpdateSettings(page, perPage)
-	db.Scopes(paginate(&pagination)).Find(&jokes)
+	j.db.Scopes(paginate(&pagination)).Find(&jokes)
 
 	return pagination.PopulateData(totalRows, jokes)
 }
 
 // JokeExistInLastMonth check if same joke exist in database and it is newer then month
-func JokeExistInLastMonth(joke *database.Joke) bool {
+func (j *JokeRepository) JokeExistInLastMonth(joke *gormModels.Joke) bool {
 	monthElier := time.Now().AddDate(0, -1, 0)
 
-	r := di.GORM().
-		Where("id = ? AND created_at > ?", joke.JokeResponse.ID, monthElier.String()).Limit(1).Find(&joke)
+	r := j.db.
+		Where("id = ? AND created_at > ?", joke.ID, monthElier.String()).Limit(1).Find(&joke)
 	if r.Error != nil {
-		fmt.Println(r.Error)
+		log.Println(r.Error)
 	}
 
 	return r.RowsAffected > 0

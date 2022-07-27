@@ -2,7 +2,11 @@ package di
 
 import (
 	"fmt"
+	"log"
 	"os"
+	"time"
+
+	"github.com/go-co-op/gocron"
 
 	// required for myslq connection
 	_ "github.com/go-sql-driver/mysql"
@@ -12,7 +16,8 @@ import (
 
 // Container for dependencies
 type Container struct {
-	gorm *gorm.DB
+	gorm      *gorm.DB
+	scheduler *gocron.Scheduler
 }
 
 var container = &Container{}
@@ -26,6 +31,15 @@ func GORM() *gorm.DB {
 	return container.gorm
 }
 
+// Scheduler gocrone scheduler connetion
+func Scheduler() *gocron.Scheduler {
+	if container.scheduler == nil {
+		container.scheduler = gocron.NewScheduler(time.UTC)
+	}
+
+	return container.scheduler
+}
+
 //OpenConnection for database inside DB var
 func openConnection() *gorm.DB {
 	if container.gorm == nil {
@@ -37,7 +51,7 @@ func openConnection() *gorm.DB {
 			panic(err)
 		}
 		container.gorm = database
-		fmt.Println("Database connected")
+		log.Println("Database connected")
 	}
 
 	return container.gorm

@@ -1,47 +1,48 @@
 package crone
 
 import (
-	"chuck-jokes/pkg/database"
+	"chuck-jokes/di"
+	"chuck-jokes/pkg/database/models/gorm"
 	"chuck-jokes/pkg/repositories"
 	"chuck-jokes/pkg/requests"
-	"fmt"
-	"time"
+	"log"
 
 	"github.com/go-co-op/gocron"
 )
 
-var scheduler *gocron.Scheduler
+// CronScheduler base struct
+type CronScheduler struct {
+	scheduler *gocron.Scheduler
+}
 
-// GetScheduler or create new scheduler
-func GetScheduler() *gocron.Scheduler {
-	if scheduler == nil {
-		scheduler = gocron.NewScheduler(time.UTC)
-		fmt.Println("Scheduler created")
-	}
-
-	return scheduler
+// NewCronScheduler create new crone scheduler
+func NewCronScheduler(scheduler *gocron.Scheduler) *CronScheduler {
+	return &CronScheduler{scheduler: scheduler}
 }
 
 func scheduleRandomJoke() {
+	db := di.GORM()
+	JokeRepository := repositories.NewJokeRepository(db)
 	joke := requests.CallRandom()
-	dbJoke := database.Joke{JokeResponse: joke}
+	dbJoke := gorm.ChangeToGormJoke(&joke)
 
-	if repositories.JokeExistInLastMonth(&dbJoke) {
+	if JokeRepository.JokeExistInLastMonth(&dbJoke) {
 		scheduleRandomJoke()
 	}
 
-	database.CreateJoke(&database.Joke{JokeResponse: joke})
-	fmt.Println("Scheduler runed")
+	dbJoke.Create(db)
+
+	log.Println("Scheduler runed")
 }
 
 // Schedule all
-func Schedule(async bool) {
-	GetScheduler().Every(1).Minute().Do(scheduleRandomJoke)
+func (c *CronScheduler) Schedule(async bool) {
+	c.scheduler.Every(1).Minute().Do(scheduleRandomJoke)
 
 	if async {
-		GetScheduler().StartAsync()
+		c.scheduler.StartAsync()
 	} else {
-		GetScheduler().StartBlocking()
+		c.scheduler.StartBlocking()
 	}
 
 }

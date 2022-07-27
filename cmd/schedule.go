@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"chuck-jokes/di"
 	"chuck-jokes/pkg/crone"
 
 	"github.com/spf13/cobra"
@@ -15,6 +16,7 @@ var schedulerCmd = &cobra.Command{
 	Short: "schedul all job inside crone",
 	Long:  `Schedule everything inside crone package`,
 	Run: func(_ *cobra.Command, _ []string) {
-		crone.Schedule(false)
+		scheduler := crone.NewCronScheduler(di.Scheduler())
+		scheduler.Schedule(false)
 	},
 }

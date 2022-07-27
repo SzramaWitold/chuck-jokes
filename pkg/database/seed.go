@@ -1,20 +1,21 @@
 package database
 
 import (
-	"fmt"
+	modelsGorm "chuck-jokes/pkg/database/models/gorm"
+	"log"
 
 	"gorm.io/gorm"
 )
 
 // Seeder base struct for initialize seed
 type Seeder struct {
-	Gorm *gorm.DB
+	factory *Factory
 }
 
 // NewSeeder create new gorm seeder
 func NewSeeder(gorm *gorm.DB) Seeder {
 	return Seeder{
-		Gorm: gorm,
+		factory: NewFactory(gorm),
 	}
 }
 
@@ -31,14 +32,14 @@ type JokeCreateRequest struct {
 
 // CategoryRequest request for add user categories with jokes
 type CategoryRequest struct {
-	user   User
+	user   modelsGorm.User
 	amount int
 	jokes  int
 }
 
 // Seed seed database withufake data
 func (s *Seeder) Seed() {
-	fmt.Println("Seed in progress...")
+	log.Println("Seed in progress...")
 	userRequest := UserCreateRequest{
 		amount:     5,
 		favourites: 5,
@@ -56,30 +57,30 @@ func (s *Seeder) Seed() {
 		}
 		s.CreateCategories(categoryRequest)
 	}
-	fmt.Println("Seed complete")
+	log.Println("Seed complete")
 }
 
 // CreateJokes create and return specify amount of jokes
-func (s *Seeder) CreateJokes(request JokeCreateRequest) []*Joke {
-	jokes := make([]*Joke, request.amount)
+func (s *Seeder) CreateJokes(request JokeCreateRequest) []*modelsGorm.Joke {
+	jokes := make([]*modelsGorm.Joke, request.amount)
 	for i := 0; i < request.amount; i++ {
-		jokes[i] = CreateJoke(nil)
+		jokes[i] = s.factory.CreateJoke()
 	}
 
 	return jokes
 }
 
 // CreateUsers create with favourite jokes
-func (s *Seeder) CreateUsers(request UserCreateRequest) []*User {
-	users := make([]*User, request.amount)
+func (s *Seeder) CreateUsers(request UserCreateRequest) []*modelsGorm.User {
+	users := make([]*modelsGorm.User, request.amount)
 	for i := 0; i < request.amount; i++ {
-		user := CreateUser(nil)
+		user := s.factory.CreateUser()
 		for j := 0; j < request.favourites; j++ {
-			joke := CreateJoke(nil)
+			joke := s.factory.CreateJoke()
 			user.Favourites = append(user.Favourites, *joke)
 		}
 		users[i] = user
-		s.Gorm.Save(&user)
+		s.factory.db.Save(&user)
 	}
 
 	return users
@@ -88,11 +89,11 @@ func (s *Seeder) CreateUsers(request UserCreateRequest) []*User {
 // CreateCategories create categories with attached jokes
 func (s *Seeder) CreateCategories(request CategoryRequest) {
 	for i := 0; i < request.amount; i++ {
-		category := CreateCategory(&request.user, nil)
+		category := s.factory.CreateCategory(&request.user, nil)
 		for j := 0; j < request.jokes; j++ {
-			joke := CreateJoke(nil)
+			joke := s.factory.CreateJoke()
 			category.Jokes = append(category.Jokes, *joke)
 		}
-		s.Gorm.Save(&category)
+		s.factory.db.Save(&category)
 	}
 }

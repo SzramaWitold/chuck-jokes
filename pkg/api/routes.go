@@ -3,29 +3,31 @@ package api
 import (
 	"chuck-jokes/pkg/repositories"
 	"chuck-jokes/pkg/utilities"
-	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-func setRoutes(engine gin.Engine) {
-	engine.GET("/jokeoftheday", jokeoftheday)
-	engine.GET("/jokes", getJokes)
+func (s *Server)  setRoutes() {
+	s.Engine.GET("/jokeoftheday", s.jokeoftheday)
+	s.Engine.GET("/jokes", s.getJokes)
 }
 
-func getJokes(c *gin.Context) {
+func (s *Server) getJokes(c *gin.Context) {
+	jokeRepository := repositories.NewJokeRepository(s.db)
 	page, perPage := getPaginationSetup(c)
-	jokes := repositories.GetJokes(page, perPage)
+	jokes := jokeRepository.GetJokes(page, perPage)
 
 	c.JSON(http.StatusOK, jokes)
 }
 
-func jokeoftheday(c *gin.Context) {
-	joke := repositories.JokeOfTheDay(utilities.GetToday().String())
+func (s *Server) jokeoftheday(c *gin.Context) {
+	jokeRepository := repositories.NewJokeRepository(s.db)
+	joke := jokeRepository.JokeOfTheDay(utilities.GetToday().String())
 	if joke == nil {
-		joke = repositories.JokeOfTheDay(utilities.GetYesterday().String())
+		joke = jokeRepository.JokeOfTheDay(utilities.GetYesterday().String())
 	}
 	c.JSON(http.StatusOK, joke)
 }
@@ -35,13 +37,13 @@ func getPaginationSetup(c *gin.Context) (int, int) {
 	page, err := strconv.Atoi(query.Get("page"))
 
 	if err != nil {
-		fmt.Println("Wrong type provide as a page parameter")
+		log.Println("Wrong type provide as a page parameter")
 	}
 
 	perPage, err := strconv.Atoi(query.Get("per_page"))
 
 	if err != nil {
-		fmt.Println("Wrong type provide as a per_page parameter")
+		log.Println("Wrong type provide as a per_page parameter")
 	}
 	return page, perPage
 }

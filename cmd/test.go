@@ -1,10 +1,6 @@
 package cmd
 
 import (
-	"chuck-jokes/pkg/database"
-	"chuck-jokes/pkg/repositories"
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
@@ -17,8 +13,5 @@ var testCmd = &cobra.Command{
 	Short: "...",
 	Long:  `....`,
 	Run: func(_ *cobra.Command, _ []string) {
-		var joke = database.Joke{}
-		joke.JokeResponse.ID = "8q7JD4FFRhqS-iiWqZkHsg"
-		fmt.Println(repositories.JokeExistInLastMonth(&joke))
 	},
 }

@@ -1,22 +1,17 @@
 package requests
 
 import (
+	"chuck-jokes/pkg/database/models/gorm"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"os"
 )
 
-// JokeResponse Base joke response from external api
-type JokeResponse struct {
-	Value string `faker:"sentence"`
-	ID    string `gorm:"primaryKey" faker:"unique"`
-}
-
 // CallRandom Call ranodm joke from external api
-func CallRandom() JokeResponse {
+func CallRandom() gorm.ExternalJoke {
 	response, err := http.Get(os.Getenv("EXTERNAL_API") + "jokes/random")
-	var joke JokeResponse
+	var joke gorm.ExternalJoke
 	if err != nil {
 		panic(err)
 	}

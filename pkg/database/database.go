@@ -3,32 +3,32 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"os"
 
 	"gorm.io/gorm"
 )
 
-// GORMMigrator use gorm for migrate models
-type GORMMigrator struct {
+// Manager use for create and migrate
+type Manager struct {
 	db     *gorm.DB
 	models []interface{}
 }
 
+// NewManager Initialize new migrator
+func NewManager(db *gorm.DB) *Manager {
+	return &Manager{
+		db:     db,
+	}
+}
+
 // MigrateModels migrate GORM models
-func (gm *GORMMigrator) MigrateModels() {
-	err := gm.db.AutoMigrate(gm.models...)
+func (m *Manager) MigrateModels(args ...interface{}) {
+	err := m.db.AutoMigrate(args...)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Migration complete")
-}
-
-// NewGORMMigrator Initialize new migrator
-func NewGORMMigrator(db *gorm.DB) *GORMMigrator {
-	return &GORMMigrator{
-		db:     db,
-		models: GetAllModels(),
-	}
+	log.Println("Migration complete")
 }
 
 // CreateDatabase base on .env file
@@ -49,12 +49,12 @@ func CreateDatabase() {
 	if err != nil {
 		existError := fmt.Sprintf("Error 1007: Can't create database '%v'; database exists", os.Getenv("DB_NAME"))
 		if err.Error() == existError {
-			fmt.Println("Database:", os.Getenv("DB_NAME"), "already exist.")
+			log.Println("Database:", os.Getenv("DB_NAME"), "already exist.")
 			os.Exit(1)
 		} else {
 			panic(err)
 		}
 	}
 
-	fmt.Println("Database:", os.Getenv("DB_NAME"), "created.")
+	log.Println("Database:", os.Getenv("DB_NAME"), "created.")
 }
