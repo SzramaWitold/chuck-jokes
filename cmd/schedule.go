@@ -13,7 +13,7 @@ func init() {
 
 var schedulerCmd = &cobra.Command{
 	Use:   "schedule:run",
-	Short: "schedul all job inside crone",
+	Short: "schedule all job inside crone",
 	Long:  `Schedule everything inside crone package`,
 	Run: func(_ *cobra.Command, _ []string) {
 		scheduler := crone.NewCronScheduler(di.Scheduler())

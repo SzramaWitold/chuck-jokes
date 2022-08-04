@@ -37,7 +37,7 @@ type CategoryRequest struct {
 	jokes  int
 }
 
-// Seed seed database withufake data
+// Seed database with fake data
 func (s *Seeder) Seed() {
 	log.Println("Seed in progress...")
 	userRequest := UserCreateRequest{

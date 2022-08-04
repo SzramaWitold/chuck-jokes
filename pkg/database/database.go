@@ -18,7 +18,7 @@ type Manager struct {
 // NewManager Initialize new migrator
 func NewManager(db *gorm.DB) *Manager {
 	return &Manager{
-		db:     db,
+		db: db,
 	}
 }
 
@@ -43,7 +43,12 @@ func CreateDatabase() {
 	if err != nil {
 		panic(err)
 	}
-	defer db.Close()
+	defer func(db *sql.DB) {
+		dbCloseError := db.Close()
+		if dbCloseError != nil {
+			panic(dbCloseError)
+		}
+	}(db)
 
 	_, err = db.Exec("CREATE DATABASE " + os.Getenv("DB_NAME"))
 	if err != nil {

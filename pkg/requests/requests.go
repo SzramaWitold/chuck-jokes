@@ -4,24 +4,29 @@ import (
 	"chuck-jokes/pkg/database/models/gorm"
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 )
 
-// CallRandom Call ranodm joke from external api
+// CallRandom Call random joke from external api
 func CallRandom() gorm.ExternalJoke {
-	response, err := http.Get(os.Getenv("EXTERNAL_API") + "jokes/random")
+	response, responseError := http.Get(os.Getenv("EXTERNAL_API") + "jokes/random")
 	var joke gorm.ExternalJoke
-	if err != nil {
-		panic(err)
-	}
-	body, err := ioutil.ReadAll(response.Body)
-
-	if err != nil {
-		panic(err)
+	if responseError != nil {
+		log.Println(responseError)
 	}
 
-	json.Unmarshal(body, &joke)
+	body, readBodyError := ioutil.ReadAll(response.Body)
+
+	if readBodyError != nil {
+		panic(readBodyError)
+	}
+
+	jsonUnmarshalError := json.Unmarshal(body, &joke)
+	if jsonUnmarshalError != nil {
+		panic(jsonUnmarshalError)
+	}
 
 	return joke
 }

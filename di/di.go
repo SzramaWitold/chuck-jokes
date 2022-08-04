@@ -1,6 +1,7 @@
 package di
 
 import (
+	"chuck-jokes/pkg/token"
 	"fmt"
 	"log"
 	"os"
@@ -18,9 +19,18 @@ import (
 type Container struct {
 	gorm      *gorm.DB
 	scheduler *gocron.Scheduler
+	jwt       *token.Validator
 }
 
 var container = &Container{}
+
+func JWT() *token.Validator {
+	if container.jwt == nil {
+		container.jwt = token.NewValidator()
+	}
+
+	return container.jwt
+}
 
 // GORM get gorm db connection
 func GORM() *gorm.DB {
@@ -31,7 +41,7 @@ func GORM() *gorm.DB {
 	return container.gorm
 }
 
-// Scheduler gocrone scheduler connetion
+// Scheduler go crone scheduler connection
 func Scheduler() *gocron.Scheduler {
 	if container.scheduler == nil {
 		container.scheduler = gocron.NewScheduler(time.UTC)

@@ -32,12 +32,15 @@ func scheduleRandomJoke() {
 
 	dbJoke.Create(db)
 
-	log.Println("Scheduler runed")
+	log.Println("Scheduler run")
 }
 
 // Schedule all
 func (c *CronScheduler) Schedule(async bool) {
-	c.scheduler.Every(1).Minute().Do(scheduleRandomJoke)
+	_, sRanJokeErr := c.scheduler.Every(1).Minute().Do(scheduleRandomJoke)
+	if sRanJokeErr != nil {
+		log.Panic(sRanJokeErr)
+	}
 
 	if async {
 		c.scheduler.StartAsync()

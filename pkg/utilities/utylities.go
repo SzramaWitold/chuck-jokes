@@ -1,8 +1,10 @@
 package utilities
 
-import "time"
+import (
+	"time"
+)
 
-// GetToday get todays date at midnight
+// GetToday get today's date at midnight
 func GetToday() time.Time {
 	return getDay(time.Now())
 }

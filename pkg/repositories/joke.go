@@ -34,9 +34,9 @@ func (j *JokeRepository) JokeOfTheDay(time string) *gormModels.Joke {
 // GetJokes get all jokes
 func (j *JokeRepository) GetJokes(page, perPage int) *Pagination {
 	var totalRows int64
-	var jokes = []gormModels.Joke{}
+	var jokes []gormModels.Joke
 	var pagination = Pagination{}
-	
+
 	j.db.Model([]gormModels.Joke{}).Count(&totalRows)
 	pagination.UpdateSettings(page, perPage)
 	j.db.Scopes(paginate(&pagination)).Find(&jokes)
@@ -44,15 +44,34 @@ func (j *JokeRepository) GetJokes(page, perPage int) *Pagination {
 	return pagination.PopulateData(totalRows, jokes)
 }
 
-// JokeExistInLastMonth check if same joke exist in database and it is newer then month
+// JokeExistInLastMonth check if same joke exist in database ,and it is newer then month
 func (j *JokeRepository) JokeExistInLastMonth(joke *gormModels.Joke) bool {
-	monthElier := time.Now().AddDate(0, -1, 0)
+	monthEarlier := time.Now().AddDate(0, -1, 0)
 
 	r := j.db.
-		Where("id = ? AND created_at > ?", joke.ID, monthElier.String()).Limit(1).Find(&joke)
+		Where("id = ? AND created_at > ?", joke.ID, monthEarlier.String()).Limit(1).Find(&joke)
 	if r.Error != nil {
 		log.Println(r.Error)
 	}
 
 	return r.RowsAffected > 0
+}
+
+func (j *JokeRepository) GetFavourites(page, perPage int, userID uint) *Pagination {
+	var totalRows int64
+	var jokes []gormModels.Joke
+	var pagination = Pagination{}
+	var user = gormModels.User{}
+
+	j.db.First(&user, userID)
+
+	totalRows = j.db.Model(&user).Association("Favourites").Count()
+	pagination.UpdateSettings(page, perPage)
+	dbError := j.db.Model(&user).Scopes(paginate(&pagination)).Association("Favourites").Find(&jokes)
+	if dbError != nil {
+		log.Println(dbError)
+		return nil
+	}
+
+	return pagination.PopulateData(totalRows, jokes)
 }
