@@ -10,17 +10,17 @@ import (
 	"time"
 )
 
-type Validator struct {
+type Handler struct {
 	secret []byte
 }
 
-func NewValidator() *Validator {
-	return &Validator{
+func NewHandler() *Handler {
+	return &Handler{
 		secret: []byte(os.Getenv("SECRET")),
 	}
 }
 
-func (v *Validator) CreateToken(user *modelsGorm.User) (string, *time.Time, *time.Time) {
+func (v *Handler) CreateToken(user *modelsGorm.User) (string, *time.Time, *time.Time) {
 	ttlDuration, refreshTTLDuration := setTTLAndRefresh()
 
 	ttl := time.Now().Add(time.Duration(ttlDuration) * time.Minute)
@@ -43,7 +43,7 @@ func (v *Validator) CreateToken(user *modelsGorm.User) (string, *time.Time, *tim
 	return tokenString, &ttl, &refreshTtl
 }
 
-func (v *Validator) ValidateToken(tokenString string) (*jwt.Token, error) {
+func (v *Handler) ValidateToken(tokenString string) (*jwt.Token, error) {
 	token, tokenErr := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])

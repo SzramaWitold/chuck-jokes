@@ -7,17 +7,17 @@ import (
 	"gorm.io/gorm"
 )
 
-// UserRepository base user repository
-type UserRepository struct {
+// User base user repository
+type User struct {
 	db *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) *UserRepository {
-	return &UserRepository{db: db}
+func NewUser(db *gorm.DB) *User {
+	return &User{db: db}
 }
 
 // Authenticate get user based on username and password
-func (u *UserRepository) Authenticate(username, password string) *gormModels.User {
+func (u *User) Authenticate(username, password string) *gormModels.User {
 	var user = gormModels.User{}
 	u.db.Where("username = ?", username).First(&user)
 
@@ -32,7 +32,18 @@ func (u *UserRepository) Authenticate(username, password string) *gormModels.Use
 	return &user
 }
 
-func (u *UserRepository) AddFavourite(userID, jokeID uint) error {
+func (u *User) GetUserFromToken(id int) *gormModels.User {
+	var user = gormModels.User{}
+	u.db.Where("ID = ?", id).First(&user)
+
+	if user.ID == 0 {
+		return nil
+	}
+
+	return &user
+}
+
+func (u *User) AddFavourite(userID, jokeID uint) error {
 	var joke = gormModels.Joke{}
 	var user = gormModels.User{}
 	u.db.First(&user, userID)

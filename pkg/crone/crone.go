@@ -22,7 +22,7 @@ func NewCronScheduler(scheduler *gocron.Scheduler) *CronScheduler {
 
 func scheduleRandomJoke() {
 	db := di.GORM()
-	JokeRepository := repositories.NewJokeRepository(db)
+	JokeRepository := repositories.NewJoke(db)
 	joke := requests.CallRandom()
 	dbJoke := gorm.ChangeToGormJoke(&joke)
 

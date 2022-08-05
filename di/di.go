@@ -2,6 +2,7 @@ package di
 
 import (
 	"chuck-jokes/pkg/token"
+	"chuck-jokes/pkg/validator"
 	"fmt"
 	"log"
 	"os"
@@ -19,14 +20,23 @@ import (
 type Container struct {
 	gorm      *gorm.DB
 	scheduler *gocron.Scheduler
-	jwt       *token.Validator
+	jwt       *token.Handler
+	validator *validator.Validator
 }
 
 var container = &Container{}
 
-func JWT() *token.Validator {
+func VALIDATOR() *validator.Validator {
+	if container.validator == nil {
+		container.validator = validator.NewValidator()
+	}
+
+	return container.validator
+}
+
+func JWT() *token.Handler {
 	if container.jwt == nil {
-		container.jwt = token.NewValidator()
+		container.jwt = token.NewHandler()
 	}
 
 	return container.jwt

@@ -15,19 +15,18 @@ type Joke struct {
 
 // Create save joke to database
 func (j *Joke) Create(db *gorm.DB) *Joke {
- tx := db.Create(j)
- if tx.Error != nil {
- 	log.Println(tx.Error)
- }
+	tx := db.Create(j)
+	if tx.Error != nil {
+		log.Println(tx.Error)
+	}
 
- return j
+	return j
 }
 
 // GetID from Joke
 func (j *Joke) GetID() uint {
 	return j.ID
 }
-
 
 // ExternalJoke for call from external api
 type ExternalJoke struct {

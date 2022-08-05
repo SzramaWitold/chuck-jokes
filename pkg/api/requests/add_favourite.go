@@ -6,23 +6,23 @@ import (
 	"strconv"
 )
 
-type AddFavouriteRequest struct {
+type AddFavourite struct {
 	UserID uint
 	JokeID uint
 }
 
-func NewAddFavouriteRequest(c *gin.Context) (*AddFavouriteRequest, error) {
-	userID, jokeID, err := validateAddFavouriteRequest(c)
+func NewAddFavouriteRequest(c *gin.Context) (*AddFavourite, error) {
+	userID, jokeID, err := validateAddFavourite(c)
 	if err != nil {
 		return nil, err
 	}
-	return &AddFavouriteRequest{
+	return &AddFavourite{
 		UserID: userID,
 		JokeID: jokeID,
 	}, nil
 }
 
-func validateAddFavouriteRequest(c *gin.Context) (uint, uint, error) {
+func validateAddFavourite(c *gin.Context) (uint, uint, error) {
 	userID, userIDErr := strconv.Atoi(c.Param("userID"))
 	jokeID, jokeErr := strconv.Atoi(c.PostForm("jokeID"))
 	if userIDErr != nil {

@@ -22,7 +22,7 @@ func NewFactory(db *gorm.DB) *Factory {
 // CreateJoke add Joke model to database or populate it with fake data
 func (f *Factory) CreateJoke() *modelsGorm.Joke {
 	joke := modelsGorm.Joke{
-		Value: faker.Sentence(),
+		Value:      faker.Sentence(),
 		ExternalID: faker.UUIDHyphenated(),
 	}
 

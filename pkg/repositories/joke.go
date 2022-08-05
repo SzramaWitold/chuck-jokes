@@ -8,20 +8,20 @@ import (
 	"gorm.io/gorm"
 )
 
-// JokeRepository base joke repository
-type JokeRepository struct {
+// Joke base joke repository
+type Joke struct {
 	db *gorm.DB
 }
 
-// NewJokeRepository create new joke repository
-func NewJokeRepository(db *gorm.DB) *JokeRepository {
-	return &JokeRepository{
+// NewJoke create new joke repository
+func NewJoke(db *gorm.DB) *Joke {
+	return &Joke{
 		db: db,
 	}
 }
 
 // JokeOfTheDay get joke of the day from specyfi day
-func (j *JokeRepository) JokeOfTheDay(time string) *gormModels.Joke {
+func (j *Joke) JokeOfTheDay(time string) *gormModels.Joke {
 	var joke = gormModels.Joke{}
 	j.db.Where("created_at >= ?", time).First(&joke)
 
@@ -32,7 +32,7 @@ func (j *JokeRepository) JokeOfTheDay(time string) *gormModels.Joke {
 }
 
 // GetJokes get all jokes
-func (j *JokeRepository) GetJokes(page, perPage int) *Pagination {
+func (j *Joke) GetJokes(page, perPage int) *Pagination {
 	var totalRows int64
 	var jokes []gormModels.Joke
 	var pagination = Pagination{}
@@ -45,7 +45,7 @@ func (j *JokeRepository) GetJokes(page, perPage int) *Pagination {
 }
 
 // JokeExistInLastMonth check if same joke exist in database ,and it is newer then month
-func (j *JokeRepository) JokeExistInLastMonth(joke *gormModels.Joke) bool {
+func (j *Joke) JokeExistInLastMonth(joke *gormModels.Joke) bool {
 	monthEarlier := time.Now().AddDate(0, -1, 0)
 
 	r := j.db.
@@ -57,7 +57,7 @@ func (j *JokeRepository) JokeExistInLastMonth(joke *gormModels.Joke) bool {
 	return r.RowsAffected > 0
 }
 
-func (j *JokeRepository) GetFavourites(page, perPage int, userID uint) *Pagination {
+func (j *Joke) GetFavourites(page, perPage int, userID uint) *Pagination {
 	var totalRows int64
 	var jokes []gormModels.Joke
 	var pagination = Pagination{}
