@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"chuck-jokes/pkg/api/requests"
 	"chuck-jokes/pkg/repositories"
 	"chuck-jokes/pkg/utilities"
 	"github.com/gin-gonic/gin"
@@ -11,22 +10,22 @@ import (
 func (cont *Controller) GetFavourites() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		repository := repositories.NewJoke(cont.DB)
-		request, requestErr := requests.NewFavourites(c)
+		request, requestErr := cont.Request.NewFavourites(c)
 		if requestErr != nil {
-			c.JSON(http.StatusBadRequest, requestErr.Error())
+			c.JSON(http.StatusBadRequest, cont.Response.NewError(requestErr))
 		}
 		jokes := repository.GetFavourites(request.Page, request.PerPage, request.UserID)
 
-		c.JSON(http.StatusOK, jokes)
+		c.JSON(http.StatusOK, cont.Response.PaginateJokes(jokes))
 	}
 }
 
 func (cont *Controller) AddFavourite() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		request, requestErr := requests.NewAddFavouriteRequest(c)
-
+		request, requestErr := cont.Request.NewAddFavouriteRequest(c)
 		if requestErr != nil {
-			c.JSON(http.StatusBadRequest, requestErr.Error())
+			c.JSON(http.StatusBadRequest, cont.Response.NewErrorsCollection(requestErr))
+			return
 		} else {
 			repository := repositories.NewUser(cont.DB)
 			repErr := repository.AddFavourite(request.UserID, request.JokeID)
@@ -35,7 +34,7 @@ func (cont *Controller) AddFavourite() func(c *gin.Context) {
 				c.JSON(http.StatusExpectationFailed, repErr.Error())
 				return
 			}
-			c.JSON(http.StatusOK, "success")
+			c.JSON(http.StatusOK, cont.Response.NewSuccess("success"))
 		}
 	}
 }
@@ -43,10 +42,10 @@ func (cont *Controller) AddFavourite() func(c *gin.Context) {
 func (cont *Controller) GetJokes() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		jokeRepository := repositories.NewJoke(cont.DB)
-		pagRequest := requests.NewPagination(c)
-		jokes := jokeRepository.GetJokes(pagRequest.Page, pagRequest.PerPage)
+		pagRequest := cont.Request.NewPagination(c)
+		repJokes := jokeRepository.GetJokes(pagRequest.Page, pagRequest.PerPage)
 
-		c.JSON(http.StatusOK, jokes)
+		c.JSON(http.StatusOK, cont.Response.PaginateJokes(repJokes))
 	}
 }
 
@@ -57,6 +56,6 @@ func (cont *Controller) GetJokeOfADay() func(c *gin.Context) {
 		if joke == nil {
 			joke = jokeRepository.JokeOfTheDay(utilities.GetYesterday().String())
 		}
-		c.JSON(http.StatusOK, joke)
+		c.JSON(http.StatusOK, cont.Response.NewJoke(joke))
 	}
 }

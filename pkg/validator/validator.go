@@ -1,22 +1,22 @@
 package validator
 
 type Validator struct {
-	Input  string
-	Errors []error
-	Valid  bool
+	Rules map[string]func(n, i string) error
 }
 
 func NewValidator() *Validator {
-	return &Validator{}
+	return &Validator{
+		Rules: rulesMap,
+	}
 }
 
-func (val *Validator) Validate(input string, rules ...string) {
-	for _, r := range rules {
-		val.Valid = true
-		err := v[r](input)
+func (val *Validator) Validate(name, input string, rules ...string) []error {
+	var errors []error
+	for _, rule := range rules {
+		err := val.Rules[rule](name, input)
 		if err != nil {
-			val.Errors = append(val.Errors, err)
-			val.Valid = false
+			errors = append(errors, err)
 		}
 	}
+	return errors
 }

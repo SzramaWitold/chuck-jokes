@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"chuck-jokes/pkg/api/requests"
-	"chuck-jokes/pkg/api/responses"
 	"chuck-jokes/pkg/repositories"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -11,25 +9,33 @@ import (
 func (cont *Controller) CreateCategory() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		repository := repositories.NewCategory(cont.DB)
-		request, requestErr := requests.NewCreateCategory(c)
+		request, requestErr := cont.Request.NewCreateCategory(c)
 		if requestErr != nil {
-			c.JSON(http.StatusBadRequest, requestErr.Error())
+			c.JSON(http.StatusBadRequest, cont.Response.NewErrorsCollection(requestErr))
 			return
 		}
 
 		category := repository.CreateCategory(request.UserID, request.Name)
 
-		c.JSON(http.StatusOK, responses.NewCategory(category))
+		c.JSON(http.StatusOK, cont.Response.NewCategory(category))
 	}
 }
 
 func (cont *Controller) AddToCategory() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		_, requestErr := requests.NewCreateCategory(c)
+		request, requestErr := cont.Request.NewAddToCategory(c)
 		if requestErr != nil {
-			c.JSON(http.StatusBadRequest, requestErr.Error())
+			c.JSON(http.StatusBadRequest, cont.Response.NewErrorsCollection(requestErr))
 			return
 		}
-		c.JSON(http.StatusOK, "I am in")
+		repository := repositories.NewCategory(cont.DB)
+		addError := repository.AddToCategory(request.UserID, request.CategoryID, request.JokeID)
+
+		if addError != nil {
+			c.JSON(http.StatusBadRequest, cont.Response.NewError(addError))
+			return
+		}
+
+		c.JSON(http.StatusOK, cont.Response.NewSuccess("success"))
 	}
 }

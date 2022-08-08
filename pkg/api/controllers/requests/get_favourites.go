@@ -9,7 +9,7 @@ type Favourites struct {
 	UserID uint
 }
 
-func NewFavourites(c *gin.Context) (*Favourites, error) {
+func (r *Request) NewFavourites(c *gin.Context) (*Favourites, error) {
 	userID, userIDErr := validateTokenUser(c)
 
 	if userIDErr != nil {
@@ -17,7 +17,7 @@ func NewFavourites(c *gin.Context) (*Favourites, error) {
 	}
 
 	return &Favourites{
-		PaginationRequest: NewPagination(c),
+		PaginationRequest: r.NewPagination(c),
 		UserID:            userID,
 	}, nil
 }

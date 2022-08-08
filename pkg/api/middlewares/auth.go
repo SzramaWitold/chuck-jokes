@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func Auth(c *gin.Context) {
+func (m *Middleware) Auth(c *gin.Context) {
 	const BearerSchema = "Bearer "
 	authHeader := c.GetHeader("Authorization")
 	tokenString := authHeader[len(BearerSchema):]

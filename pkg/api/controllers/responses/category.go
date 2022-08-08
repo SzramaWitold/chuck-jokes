@@ -12,8 +12,8 @@ type Category struct {
 	UserID    uint
 }
 
-func NewCategory(category *gormModels.Category) *Category {
-	return &Category{
+func (r *Response) NewCategory(category *gormModels.Category) Category {
+	return Category{
 		ID:        category.ID,
 		CreatedAt: &category.CreatedAt,
 		Name:      category.Name,

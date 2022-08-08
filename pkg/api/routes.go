@@ -1,19 +1,13 @@
 package api
 
-import (
-	"chuck-jokes/pkg/api/controllers"
-	"chuck-jokes/pkg/api/middlewares"
-)
-
 func (s *Server) setRoutes() {
-	controller := controllers.NewController(s.DB)
-	s.Engine.POST("/login", controller.Login())
-	s.Engine.Use(middlewares.Auth).POST("/me", controller.GetMe())
-	s.Engine.Use(middlewares.Auth).PUT("/favourite", controller.AddFavourite())
-	s.Engine.Use(middlewares.Auth).GET("/favourite", controller.GetFavourites())
-	s.Engine.Use(middlewares.Auth).POST("/categories", controller.CreateCategory())
-	s.Engine.Use(middlewares.Auth).PUT("/categories/:id", controller.CreateCategory())
+	s.Engine.POST("/login", s.Controller.Login())
+	s.Engine.Use(s.Middleware.Auth).POST("/me", s.Controller.GetMe())
+	s.Engine.Use(s.Middleware.Auth).PUT("/favourite", s.Controller.AddFavourite())
+	s.Engine.Use(s.Middleware.Auth).GET("/favourite", s.Controller.GetFavourites())
+	s.Engine.Use(s.Middleware.Auth).POST("/categories", s.Controller.CreateCategory())
+	s.Engine.Use(s.Middleware.Auth).PUT("/categories/:ID", s.Controller.AddToCategory())
 
-	s.Engine.GET("/jokeoftheday", controller.GetJokeOfADay())
-	s.Engine.GET("/jokes", controller.GetJokes())
+	s.Engine.GET("/jokeoftheday", s.Controller.GetJokeOfADay())
+	s.Engine.GET("/jokes", s.Controller.GetJokes())
 }

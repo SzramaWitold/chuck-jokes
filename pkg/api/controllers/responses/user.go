@@ -13,8 +13,8 @@ type UserResponse struct {
 	Username  string
 }
 
-func NewUserResponse(user *modelsGorm.User) *UserResponse {
-	return &UserResponse{
+func (r *Response) NewUserResponse(user *modelsGorm.User) UserResponse {
+	return UserResponse{
 		ID:        user.ID,
 		CreatedAt: &user.CreatedAt,
 		UpdatedAt: &user.UpdatedAt,

@@ -53,7 +53,7 @@ func (u *User) AddFavourite(userID, jokeID uint) error {
 		return fmt.Errorf("user with provided id: %v not exist", userID)
 	}
 
-	if user.ID == 0 {
+	if joke.ID == 0 {
 		return fmt.Errorf("joke with provided id: %v not exist", jokeID)
 	}
 

@@ -2,6 +2,7 @@ package repositories
 
 import (
 	gormModels "chuck-jokes/pkg/database/models/gorm"
+	"fmt"
 	"gorm.io/gorm"
 	"log"
 )
@@ -32,4 +33,24 @@ func (c *Category) CreateCategory(userID uint, name string) *gormModels.Category
 	}
 
 	return &category
+}
+
+func (c *Category) AddToCategory(userId, categoryID, jokeID uint) error {
+	var category = gormModels.Category{}
+	c.db.First(&category, categoryID)
+	if category.ID == 0 {
+		return fmt.Errorf("can not find category with provided ID: %v", categoryID)
+	}
+	if category.UserID != userId {
+		return fmt.Errorf("do not have permission to add joke to this category")
+	}
+
+	var joke = gormModels.Joke{}
+	c.db.First(&joke, jokeID)
+
+	if joke.ID == 0 {
+		return fmt.Errorf("joke with provided id: %v not exist", jokeID)
+	}
+
+	return nil
 }

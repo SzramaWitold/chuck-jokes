@@ -3,16 +3,20 @@ package repositories
 import "math"
 
 // Pagination base return struct for Pagination
-type Pagination struct {
+type Pagination[T interface{}] struct {
 	Page       int
 	PerPage    int
 	TotalRows  int64
 	TotalPages int
-	Rows       interface{}
+	Rows       []T
+}
+
+func NewPagination[T interface{}]() *Pagination[T] {
+	return &Pagination[T]{}
 }
 
 // UpdateSettings Pagination with base setting
-func (p *Pagination) UpdateSettings(page, perPage int) *Pagination {
+func (p *Pagination[T]) UpdateSettings(page, perPage int) *Pagination[T] {
 	if page == 0 {
 		p.Page = 1
 	} else {
@@ -32,7 +36,7 @@ func (p *Pagination) UpdateSettings(page, perPage int) *Pagination {
 }
 
 // PopulateData populate pagination struct with database data
-func (p *Pagination) PopulateData(totalRows int64, rows interface{}) *Pagination {
+func (p *Pagination[T]) PopulateData(totalRows int64, rows []T) *Pagination[T] {
 	p.TotalRows = totalRows
 	p.TotalPages = int(math.Ceil(float64(totalRows) / float64(p.PerPage)))
 	p.Rows = rows
