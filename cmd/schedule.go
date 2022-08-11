@@ -16,7 +16,7 @@ var schedulerCmd = &cobra.Command{
 	Short: "schedule all job inside crone",
 	Long:  `Schedule everything inside crone package`,
 	Run: func(_ *cobra.Command, _ []string) {
-		scheduler := crone.NewCronScheduler(di.Scheduler())
+		scheduler := crone.NewCronScheduler(di.Scheduler(), di.GORM())
 		scheduler.Schedule(false)
 	},
 }

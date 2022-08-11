@@ -12,7 +12,7 @@ var rootCmd = &cobra.Command{
 	Short: "Create and get server",
 	Long:  `Create and get server for chuck noris jokes application`,
 	Run: func(_ *cobra.Command, _ []string) {
-		server := api.StartEngine(di.GORM(), di.VALIDATOR())
+		server := api.StartEngine(di.GORM(), di.VALIDATOR(), di.JWT())
 		serverError := server.Engine.Run(":8080")
 		if serverError != nil {
 			log.Panic(serverError)
