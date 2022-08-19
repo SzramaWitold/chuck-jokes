@@ -24,7 +24,7 @@ func isUint(n, i string) error {
 		return fmt.Errorf("field '%v' should be of numeric type", n)
 	}
 
-	if inputInt < 0 {
+	if inputInt <= 0 {
 		return fmt.Errorf("field '%v' should be positive number", n)
 	}
 

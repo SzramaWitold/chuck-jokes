@@ -1,7 +1,8 @@
 package repositories
 
 import (
-	gormModels "chuck-jokes/pkg/database/models/gorm"
+	"chuck-jokes/models"
+	gormModels "chuck-jokes/pkg/database/gorm/models"
 	"log"
 	"time"
 
@@ -21,8 +22,8 @@ func NewJoke(db *gorm.DB) *Joke {
 }
 
 // JokeOfTheDay get joke of the day from specyfi day
-func (j *Joke) JokeOfTheDay(time string) *gormModels.Joke {
-	var joke = gormModels.Joke{}
+func (j *Joke) JokeOfTheDay(time string) *models.Joke {
+	var joke = models.Joke{}
 	j.db.Where("created_at >= ?", time).First(&joke)
 
 	if joke.ExternalID == "" {
@@ -32,12 +33,12 @@ func (j *Joke) JokeOfTheDay(time string) *gormModels.Joke {
 }
 
 // GetJokes get all jokes
-func (j *Joke) GetJokes(page, perPage int) *Pagination[gormModels.Joke] {
+func (j *Joke) GetJokes(page, perPage int) *Pagination[models.Joke] {
 	var totalRows int64
-	var jokes []gormModels.Joke
-	var pagination = NewPagination[gormModels.Joke]()
+	var jokes []models.Joke
+	var pagination = NewPagination[models.Joke]()
 
-	j.db.Model([]gormModels.Joke{}).Count(&totalRows)
+	j.db.Model([]models.Joke{}).Count(&totalRows)
 	pagination.UpdateSettings(page, perPage)
 	j.db.Scopes(paginate(pagination)).Find(&jokes)
 
@@ -45,7 +46,7 @@ func (j *Joke) GetJokes(page, perPage int) *Pagination[gormModels.Joke] {
 }
 
 // JokeExistInLastMonth check if same joke exist in database ,and it is newer then month
-func (j *Joke) JokeExistInLastMonth(joke *gormModels.Joke) bool {
+func (j *Joke) JokeExistInLastMonth(joke *models.Joke) bool {
 	monthEarlier := time.Now().AddDate(0, -1, 0)
 
 	r := j.db.
@@ -57,10 +58,10 @@ func (j *Joke) JokeExistInLastMonth(joke *gormModels.Joke) bool {
 	return r.RowsAffected > 0
 }
 
-func (j *Joke) GetFavourites(page, perPage int, userID uint) *Pagination[gormModels.Joke] {
+func (j *Joke) GetFavourites(page, perPage int, userID uint) *Pagination[models.Joke] {
 	var totalRows int64
-	var jokes []gormModels.Joke
-	var pagination = NewPagination[gormModels.Joke]()
+	var jokes []models.Joke
+	var pagination = NewPagination[models.Joke]()
 	var user = gormModels.User{}
 
 	j.db.First(&user, userID)

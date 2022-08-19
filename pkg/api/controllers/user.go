@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"chuck-jokes/pkg/repositories"
-	"chuck-jokes/pkg/token"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -12,7 +11,7 @@ import (
 func (cont *Controller) GetMe() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		userRepository := repositories.NewUser(cont.DB)
-		userID, userIDErr := strconv.Atoi(c.Param("userID"))
+		userID, userIDErr := strconv.Atoi(c.Param("UserID"))
 		if userIDErr != nil {
 			c.JSON(http.StatusUnauthorized, cont.Response.NewError(fmt.Errorf("invalid token, can not fina user")))
 			return
@@ -37,9 +36,8 @@ func (cont *Controller) Login() func(c *gin.Context) {
 
 		user := userRepository.Authenticate(request.Username, request.Password)
 		if user != nil {
-			validator := token.NewHandler()
-
-			c.JSON(http.StatusOK, cont.Response.NewTokenResponse(validator.CreateToken(user)))
+			baseJwt := *cont.JWT
+			c.JSON(http.StatusOK, cont.Response.NewTokenResponse(baseJwt.CreateToken(user)))
 		} else {
 			c.JSON(http.StatusUnauthorized, cont.Response.NewError(fmt.Errorf("wrong credentials")))
 		}

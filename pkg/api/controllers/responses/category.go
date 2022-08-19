@@ -1,7 +1,7 @@
 package responses
 
 import (
-	gormModels "chuck-jokes/pkg/database/models/gorm"
+	"chuck-jokes/models"
 	"time"
 )
 
@@ -12,7 +12,7 @@ type Category struct {
 	UserID    uint
 }
 
-func (r *Response) NewCategory(category *gormModels.Category) Category {
+func (r *Response) NewCategory(category *models.Category) Category {
 	return Category{
 		ID:        category.ID,
 		CreatedAt: &category.CreatedAt,

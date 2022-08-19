@@ -1,40 +1,46 @@
 package token
 
 import (
-	modelsGorm "chuck-jokes/pkg/database/models/gorm"
+	"chuck-jokes/models"
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
 	"log"
-	"os"
 	"strconv"
 	"time"
 )
 
-type Handler struct {
-	secret []byte
+type IHandler interface {
+	CreateToken(user *models.User) (string, *time.Time, *time.Time)
+	ValidateToken(tokenString string) (*jwt.Token, error)
 }
 
-func NewHandler() *Handler {
-	return &Handler{
-		secret: []byte(os.Getenv("SECRET")),
+type Handler struct {
+	secret     []byte
+	ttl        int
+	refreshTtl int
+}
+
+func NewHandler(secret string, ttl, refreshTTL int) IHandler {
+	return Handler{
+		secret:     []byte(secret),
+		ttl:        ttl,
+		refreshTtl: refreshTTL,
 	}
 }
 
-func (v *Handler) CreateToken(user *modelsGorm.User) (string, *time.Time, *time.Time) {
-	ttlDuration, refreshTTLDuration := setTTLAndRefresh()
-
-	ttl := time.Now().Add(time.Duration(ttlDuration) * time.Minute)
-	refreshTtl := time.Now().Add(time.Duration(refreshTTLDuration) * time.Minute)
+func (h Handler) CreateToken(user *models.User) (string, *time.Time, *time.Time) {
+	ttl := time.Now().Add(time.Duration(h.ttl) * time.Minute)
+	refreshTtl := time.Now().Add(time.Duration(h.refreshTtl) * time.Minute)
 	token := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
 		jwt.MapClaims{
-			"userID":      user.ID,
+			"UserID":      user.ID,
 			"ttl":         strconv.Itoa(int(ttl.Unix())),
 			"refresh_ttl": strconv.Itoa(int(refreshTtl.Unix())),
 		},
 	)
 
-	tokenString, stringTokenError := token.SignedString(v.secret)
+	tokenString, stringTokenError := token.SignedString(h.secret)
 
 	if stringTokenError != nil {
 		log.Println(stringTokenError)
@@ -43,13 +49,13 @@ func (v *Handler) CreateToken(user *modelsGorm.User) (string, *time.Time, *time.
 	return tokenString, &ttl, &refreshTtl
 }
 
-func (v *Handler) ValidateToken(tokenString string) (*jwt.Token, error) {
+func (h Handler) ValidateToken(tokenString string) (*jwt.Token, error) {
 	token, tokenErr := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
-		return v.secret, nil
+		return h.secret, nil
 	})
 
 	if tokenErr != nil {
@@ -70,28 +76,4 @@ func (v *Handler) ValidateToken(tokenString string) (*jwt.Token, error) {
 	}
 
 	return token, nil
-}
-
-func setTTLAndRefresh() (int, int) {
-	ttlDuration := 5
-	refreshTTLDuration := 10
-	if os.Getenv("TTL") != "" {
-		newTTL, ttlErr := strconv.Atoi(os.Getenv("TTL"))
-		if ttlErr != nil {
-			log.Println(ttlErr)
-		} else {
-			ttlDuration = newTTL
-		}
-	}
-
-	if os.Getenv("TTL") != "" {
-		newRefreshTTL, ttlErr := strconv.Atoi(os.Getenv("REFRESH_TTL"))
-		if ttlErr != nil {
-			log.Println(ttlErr)
-		} else {
-			refreshTTLDuration = newRefreshTTL
-		}
-	}
-
-	return ttlDuration, refreshTTLDuration
 }

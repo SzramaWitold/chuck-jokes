@@ -16,7 +16,6 @@ func (cont *Controller) CreateCategory() func(c *gin.Context) {
 		}
 
 		category := repository.CreateCategory(request.UserID, request.Name)
-
 		c.JSON(http.StatusOK, cont.Response.NewCategory(category))
 	}
 }

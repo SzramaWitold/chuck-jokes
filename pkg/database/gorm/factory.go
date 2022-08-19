@@ -1,8 +1,7 @@
-package database
+package gorm
 
 import (
-	modelsGorm "chuck-jokes/pkg/database/models/gorm"
-
+	"chuck-jokes/pkg/database/gorm/models"
 	"github.com/bxcodec/faker/v3"
 	"gorm.io/gorm"
 )
@@ -20,8 +19,8 @@ func NewFactory(db *gorm.DB) *Factory {
 }
 
 // CreateJoke add Joke model to database or populate it with fake data
-func (f *Factory) CreateJoke() *modelsGorm.Joke {
-	joke := modelsGorm.Joke{
+func (f *Factory) CreateJoke() *models.Joke {
+	joke := models.Joke{
 		Value:      faker.Sentence(),
 		ExternalID: faker.UUIDHyphenated(),
 	}
@@ -32,25 +31,25 @@ func (f *Factory) CreateJoke() *modelsGorm.Joke {
 }
 
 // CreateUser add fake User model to database
-func (f *Factory) CreateUser() *modelsGorm.User {
-	user := modelsGorm.User{}
+func (f *Factory) CreateUser() *models.User {
+	user := models.User{}
 	user.Name = faker.Name()
 	user.Password = faker.Password()
 	user.Username = faker.Email()
 
-	f.db.Create(user)
+	f.db.Create(&user)
 
 	return &user
 }
 
 // CreateCategory add fake User category model to database
-func (f *Factory) CreateCategory(user *modelsGorm.User, category *modelsGorm.Category) *modelsGorm.Category {
+func (f *Factory) CreateCategory(user *models.User, category *models.Category) *models.Category {
 	if user == nil {
 		panic("User required for category")
 	}
 
 	if category == nil {
-		category = new(modelsGorm.Category)
+		category = new(models.Category)
 		category.Name = faker.Name()
 		category.UserID = user.ID
 	}

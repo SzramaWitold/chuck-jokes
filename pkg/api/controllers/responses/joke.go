@@ -1,7 +1,7 @@
 package responses
 
 import (
-	gormModels "chuck-jokes/pkg/database/models/gorm"
+	"chuck-jokes/models"
 	"chuck-jokes/pkg/repositories"
 	"time"
 )
@@ -13,7 +13,7 @@ type Joke struct {
 	Value     string
 }
 
-func (r *Response) NewJoke(joke *gormModels.Joke) Joke {
+func (r *Response) NewJoke(joke *models.Joke) Joke {
 	return Joke{
 		ID:        joke.ID,
 		CreatedAt: joke.CreatedAt,
@@ -22,7 +22,7 @@ func (r *Response) NewJoke(joke *gormModels.Joke) Joke {
 	}
 }
 
-func (r *Response) NewJokeCollection(jokes []gormModels.Joke) []Joke {
+func (r *Response) NewJokeCollection(jokes []models.Joke) []Joke {
 	var jokesCollection []Joke
 
 	for _, joke := range jokes {
@@ -32,6 +32,6 @@ func (r *Response) NewJokeCollection(jokes []gormModels.Joke) []Joke {
 	return jokesCollection
 }
 
-func (r *Response) PaginateJokes(repJokes *repositories.Pagination[gormModels.Joke]) *Pagination[Joke] {
+func (r *Response) PaginateJokes(repJokes *repositories.Pagination[models.Joke]) *Pagination[Joke] {
 	return ResponsePagination[Joke](repJokes.Page, repJokes.PerPage, repJokes.TotalRows, repJokes.TotalPages, r.NewJokeCollection(repJokes.Rows))
 }

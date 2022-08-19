@@ -9,10 +9,10 @@ import (
 )
 
 type AuthenticationMiddleware struct {
-	JWT *token.Handler
+	JWT *token.IHandler
 }
 
-func NewAuthenticationMiddleware(JWT *token.Handler) *AuthenticationMiddleware {
+func NewAuthenticationMiddleware(JWT *token.IHandler) *AuthenticationMiddleware {
 	return &AuthenticationMiddleware{JWT: JWT}
 }
 
@@ -21,7 +21,8 @@ func (mid *AuthenticationMiddleware) Auth(c *gin.Context) {
 	authHeader := c.GetHeader("Authorization")
 	tokenString := authHeader[len(BearerSchema):]
 
-	t, tokenErr := mid.JWT.ValidateToken(tokenString)
+	baseJwt := *mid.JWT
+	t, tokenErr := baseJwt.ValidateToken(tokenString)
 	if tokenErr != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, tokenErr.Error())
 		return
@@ -31,7 +32,7 @@ func (mid *AuthenticationMiddleware) Auth(c *gin.Context) {
 	}
 
 	if claims, ok := t.Claims.(jwt.MapClaims); ok {
-		c.AddParam("userID", fmt.Sprintf("%v", claims["userID"]))
+		c.AddParam("UserID", fmt.Sprintf("%v", claims["UserID"]))
 	}
 
 	c.Next()

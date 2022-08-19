@@ -1,4 +1,4 @@
-package gorm
+package models
 
 // GetAllModels for gorm migrations
 func GetAllModels() []interface{} {

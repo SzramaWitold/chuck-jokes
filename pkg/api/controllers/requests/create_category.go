@@ -5,20 +5,25 @@ import (
 )
 
 type CreateCategory struct {
-	UserID uint
-	Name   string
+	UserID uint   `validation:"required,uint"`
+	Name   string `validation:"required"`
 }
 
 func (r *Request) NewCreateCategory(c *gin.Context) (*CreateCategory, []error) {
-	var errors []error
-	errors = append(errors, r.Validator.Validate("userID", c.Param("userID"), "required", "uint")...)
-	errors = append(errors, r.Validator.Validate("name", c.PostForm("name"), "required")...)
+
+	inputParams := map[string]string{
+		"UserID": c.Param("UserID"),
+		"JokeID": c.PostForm("Name"),
+	}
+	var request CreateCategory
+	errors := r.Validator.Validate(&request, inputParams)
 
 	if errors != nil {
 		return nil, errors
 	}
-	return &CreateCategory{
-		UserID: changeToUint(c.Param("userID")),
-		Name:   c.PostForm("name"),
-	}, nil
+
+	request.UserID = changeToUint(c.Param("UserID"))
+	request.Name = c.PostForm("Name")
+
+	return &request, nil
 }

@@ -1,4 +1,4 @@
-package database
+package gorm
 
 import (
 	"database/sql"
@@ -31,15 +31,15 @@ func (m *Manager) MigrateModels(args ...interface{}) {
 	log.Println("Migration complete")
 }
 
-// CreateDatabase base on .env file
-func CreateDatabase() {
+// CreateDatabase with provided credentials
+func CreateDatabase(dbType, dbName, user, password, host, port string) {
 	dataSource := fmt.Sprintf("%v:%v@tcp(%v:%v)/",
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASSWORD"),
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_PORT"),
+		user,
+		password,
+		host,
+		port,
 	)
-	db, err := sql.Open(os.Getenv("DB_TYPE"), dataSource)
+	db, err := sql.Open(dbType, dataSource)
 	if err != nil {
 		panic(err)
 	}
@@ -50,16 +50,16 @@ func CreateDatabase() {
 		}
 	}(db)
 
-	_, err = db.Exec("CREATE DATABASE " + os.Getenv("DB_NAME"))
+	_, err = db.Exec("CREATE DATABASE " + dbName)
 	if err != nil {
-		existError := fmt.Sprintf("Error 1007: Can't create database '%v'; database exists", os.Getenv("DB_NAME"))
+		existError := fmt.Sprintf("Error 1007: Can't create database '%v'; database exists", dbName)
 		if err.Error() == existError {
-			log.Println("Database:", os.Getenv("DB_NAME"), "already exist.")
+			log.Println("Database:", dbName, "already exist.")
 			os.Exit(1)
 		} else {
 			panic(err)
 		}
 	}
 
-	log.Println("Database:", os.Getenv("DB_NAME"), "created.")
+	log.Println("Database:", dbName, "created.")
 }

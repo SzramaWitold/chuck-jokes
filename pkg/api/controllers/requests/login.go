@@ -9,16 +9,19 @@ type LoginRequest struct {
 }
 
 func (r *Request) NewLogin(c *gin.Context) (*LoginRequest, []error) {
-	var errors []error
-	errors = append(errors, r.Validator.Validate("username", c.PostForm("username"), "required")...)
-	errors = append(errors, r.Validator.Validate("password", c.PostForm("password"), "required")...)
+	inputParams := map[string]string{
+		"Username": c.Param("Username"),
+		"Password": c.PostForm("Password"),
+	}
+	var request LoginRequest
+	errors := r.Validator.Validate(&request, inputParams)
 
 	if errors != nil {
 		return nil, errors
 	}
 
-	return &LoginRequest{
-		Username: c.PostForm("username"),
-		Password: c.PostForm("password"),
-	}, nil
+	request.Username = c.PostForm("Username")
+	request.Password = c.PostForm("Password")
+
+	return &request, nil
 }

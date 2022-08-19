@@ -7,6 +7,15 @@ import (
 	"strconv"
 )
 
+type IRequest interface {
+	NewCreateCategory(c *gin.Context) (*CreateCategory, []error)
+	NewLogin(c *gin.Context) (*LoginRequest, []error)
+	NewAddFavouriteRequest(c *gin.Context) (*AddFavourite, []error)
+	NewFavourites(c *gin.Context) (*Favourites, error)
+	NewPagination(c *gin.Context) PaginationRequest
+	NewAddToCategory(c *gin.Context) (*AddToCategory, []error)
+}
+
 type Request struct {
 	Validator *validator.Validator
 }
@@ -18,7 +27,7 @@ func NewRequest(validator *validator.Validator) *Request {
 }
 
 func validateTokenUser(c *gin.Context) (uint, error) {
-	userID, userIDErr := strconv.Atoi(c.Param("userID"))
+	userID, userIDErr := strconv.Atoi(c.Param("UserID"))
 	if userIDErr != nil {
 		log.Println(userIDErr)
 		return 0, userIDErr

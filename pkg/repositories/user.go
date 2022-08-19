@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	gormModels "chuck-jokes/pkg/database/models/gorm"
+	"chuck-jokes/models"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -17,8 +17,8 @@ func NewUser(db *gorm.DB) *User {
 }
 
 // Authenticate get user based on username and password
-func (u *User) Authenticate(username, password string) *gormModels.User {
-	var user = gormModels.User{}
+func (u *User) Authenticate(username, password string) *models.User {
+	var user = models.User{}
 	u.db.Where("username = ?", username).First(&user)
 
 	if user.ID == 0 {
@@ -32,8 +32,8 @@ func (u *User) Authenticate(username, password string) *gormModels.User {
 	return &user
 }
 
-func (u *User) GetUserFromToken(id int) *gormModels.User {
-	var user = gormModels.User{}
+func (u *User) GetUserFromToken(id int) *models.User {
+	var user = models.User{}
 	u.db.Where("ID = ?", id).First(&user)
 
 	if user.ID == 0 {
@@ -44,8 +44,8 @@ func (u *User) GetUserFromToken(id int) *gormModels.User {
 }
 
 func (u *User) AddFavourite(userID, jokeID uint) error {
-	var joke = gormModels.Joke{}
-	var user = gormModels.User{}
+	var joke = models.Joke{}
+	var user = models.User{}
 	u.db.First(&user, userID)
 	u.db.First(&joke, jokeID)
 

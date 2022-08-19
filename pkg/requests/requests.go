@@ -1,18 +1,42 @@
 package requests
 
 import (
-	"chuck-jokes/pkg/database/models/gorm"
+	"chuck-jokes/models"
 	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 )
 
+type IExternalRequest interface {
+	CallRandom() *models.Joke
+}
+
+type ExternalRequest struct {
+	Random string
+}
+
+func NewExternalRequest(random string) IExternalRequest {
+	return &ExternalRequest{Random: random}
+}
+
+// Joke for call from external api
+type Joke struct {
+	Value string
+	ID    string
+}
+
+func (j *Joke) ChangeToBaseModel() *models.Joke {
+	return &models.Joke{
+		Value:      j.Value,
+		ExternalID: j.ID,
+	}
+}
+
 // CallRandom Call random joke from external api
-func CallRandom() gorm.ExternalJoke {
-	response, responseError := http.Get(os.Getenv("EXTERNAL_API") + "jokes/random")
-	var joke gorm.ExternalJoke
+func (e ExternalRequest) CallRandom() *models.Joke {
+	response, responseError := http.Get(e.Random)
+	var joke Joke
 	if responseError != nil {
 		log.Println(responseError)
 	}
@@ -28,5 +52,5 @@ func CallRandom() gorm.ExternalJoke {
 		panic(jsonUnmarshalError)
 	}
 
-	return joke
+	return joke.ChangeToBaseModel()
 }

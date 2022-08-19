@@ -1,7 +1,7 @@
 package responses
 
 import (
-	modelsGorm "chuck-jokes/pkg/database/models/gorm"
+	"chuck-jokes/models"
 	"time"
 )
 
@@ -13,7 +13,7 @@ type UserResponse struct {
 	Username  string
 }
 
-func (r *Response) NewUserResponse(user *modelsGorm.User) UserResponse {
+func (r *Response) NewUserResponse(user *models.User) UserResponse {
 	return UserResponse{
 		ID:        user.ID,
 		CreatedAt: &user.CreatedAt,

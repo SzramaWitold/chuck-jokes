@@ -1,7 +1,7 @@
-package database
+package gorm
 
 import (
-	modelsGorm "chuck-jokes/pkg/database/models/gorm"
+	"chuck-jokes/pkg/database/gorm/models"
 	"log"
 
 	"gorm.io/gorm"
@@ -32,7 +32,7 @@ type JokeCreateRequest struct {
 
 // CategoryRequest request for add user categories with jokes
 type CategoryRequest struct {
-	user   modelsGorm.User
+	user   models.User
 	amount int
 	jokes  int
 }
@@ -61,8 +61,8 @@ func (s *Seeder) Seed() {
 }
 
 // CreateJokes create and return specify amount of jokes
-func (s *Seeder) CreateJokes(request JokeCreateRequest) []*modelsGorm.Joke {
-	jokes := make([]*modelsGorm.Joke, request.amount)
+func (s *Seeder) CreateJokes(request JokeCreateRequest) []*models.Joke {
+	jokes := make([]*models.Joke, request.amount)
 	for i := 0; i < request.amount; i++ {
 		jokes[i] = s.factory.CreateJoke()
 	}
@@ -71,8 +71,8 @@ func (s *Seeder) CreateJokes(request JokeCreateRequest) []*modelsGorm.Joke {
 }
 
 // CreateUsers create with favourite jokes
-func (s *Seeder) CreateUsers(request UserCreateRequest) []*modelsGorm.User {
-	users := make([]*modelsGorm.User, request.amount)
+func (s *Seeder) CreateUsers(request UserCreateRequest) []*models.User {
+	users := make([]*models.User, request.amount)
 	for i := 0; i < request.amount; i++ {
 		user := s.factory.CreateUser()
 		for j := 0; j < request.favourites; j++ {
