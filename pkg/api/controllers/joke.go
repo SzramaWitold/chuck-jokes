@@ -3,6 +3,7 @@ package controllers
 import (
 	"chuck-jokes/pkg/repositories"
 	"chuck-jokes/pkg/utilities"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -52,9 +53,22 @@ func (cont *Controller) GetJokes() func(c *gin.Context) {
 func (cont *Controller) GetJokeOfADay() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		jokeRepository := repositories.NewJoke(cont.DB)
-		joke := jokeRepository.JokeOfTheDay(utilities.GetToday().String())
+		request, requestErr := cont.Request.NewJokeOfADay(c)
+
+		if requestErr != nil {
+			c.JSON(http.StatusBadRequest, cont.Response.NewErrorsCollection(requestErr))
+			return
+		}
+
+		if request.Date == "" {
+			request.Date = utilities.GetToday().String()
+		}
+
+		joke := jokeRepository.JokeOfTheDay(request.Date)
+
 		if joke == nil {
-			joke = jokeRepository.JokeOfTheDay(utilities.GetYesterday().String())
+			c.JSON(http.StatusNotFound, cont.Response.NewError(fmt.Errorf("can not find joke for date: %v", request.Date)))
+			return
 		}
 		c.JSON(http.StatusOK, cont.Response.NewJoke(joke))
 	}

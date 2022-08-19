@@ -17,7 +17,7 @@ func (r *Request) NewAddToCategory(c *gin.Context) (*AddToCategory, []error) {
 		"ID":     c.Param("ID"),
 	}
 	request := AddToCategory{}
-	errors := r.Validator.Validate(&request, inputParams)
+	errors := r.Validator.Validate(request, inputParams)
 	if errors != nil {
 		return nil, errors
 	}

@@ -4,6 +4,7 @@ import (
 	"chuck-jokes/pkg/database/gorm/models"
 	"github.com/bxcodec/faker/v3"
 	"gorm.io/gorm"
+	"time"
 )
 
 // Factory base struct for create data inside database
@@ -19,11 +20,12 @@ func NewFactory(db *gorm.DB) *Factory {
 }
 
 // CreateJoke add Joke model to database or populate it with fake data
-func (f *Factory) CreateJoke() *models.Joke {
+func (f *Factory) CreateJoke(addDays int) *models.Joke {
 	joke := models.Joke{
 		Value:      faker.Sentence(),
 		ExternalID: faker.UUIDHyphenated(),
 	}
+	joke.CreatedAt = time.Now().Add(24 * time.Duration(addDays) * time.Hour)
 
 	f.db.Create(&joke)
 

@@ -12,7 +12,7 @@ type Category struct {
 	UpdatedAt time.Time
 	DeletedAt sql.NullTime
 	Name      string
-	Jokes     []Joke
+	Jokes     []Joke `gorm:"many2many:categories_jokes;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	UserID    uint
-	User      User
+	User      User `gorm:"foreignKey:UserID;"`
 }

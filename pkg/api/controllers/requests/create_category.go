@@ -13,10 +13,10 @@ func (r *Request) NewCreateCategory(c *gin.Context) (*CreateCategory, []error) {
 
 	inputParams := map[string]string{
 		"UserID": c.Param("UserID"),
-		"JokeID": c.PostForm("Name"),
+		"Name":   c.PostForm("Name"),
 	}
 	var request CreateCategory
-	errors := r.Validator.Validate(&request, inputParams)
+	errors := r.Validator.Validate(request, inputParams)
 
 	if errors != nil {
 		return nil, errors

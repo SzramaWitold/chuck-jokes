@@ -26,9 +26,9 @@ type Container struct {
 
 var container = &Container{}
 
-func VALIDATOR() *validator.Validator {
+func VALIDATOR(db *gorm.DB) *validator.Validator {
 	if container.validator == nil {
-		container.validator = validator.NewValidator()
+		container.validator = validator.NewValidator(db)
 	}
 
 	return container.validator

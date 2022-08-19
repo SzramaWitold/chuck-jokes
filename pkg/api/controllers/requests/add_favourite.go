@@ -16,7 +16,7 @@ func (r *Request) NewAddFavouriteRequest(c *gin.Context) (*AddFavourite, []error
 	}
 
 	var request AddFavourite
-	errors := r.Validator.Validate(&request, inputParams)
+	errors := r.Validator.Validate(request, inputParams)
 
 	if errors != nil {
 		return nil, errors

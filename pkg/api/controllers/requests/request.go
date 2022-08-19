@@ -14,6 +14,8 @@ type IRequest interface {
 	NewFavourites(c *gin.Context) (*Favourites, error)
 	NewPagination(c *gin.Context) PaginationRequest
 	NewAddToCategory(c *gin.Context) (*AddToCategory, []error)
+	NewJokeOfADay(c *gin.Context) (*JokeOfADay, []error)
+	NewRegister(c *gin.Context) (*Register, []error)
 }
 
 type Request struct {

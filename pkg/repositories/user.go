@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"chuck-jokes/models"
+	gormModels "chuck-jokes/pkg/database/gorm/models"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -14,6 +15,26 @@ type User struct {
 
 func NewUser(db *gorm.DB) *User {
 	return &User{db: db}
+}
+
+func (u *User) Register(name, username, password string) error {
+	hashPassword, hashPasswordErr := hashPassword(password)
+	if hashPasswordErr != nil {
+		return hashPasswordErr
+	}
+	var user = gormModels.User{
+		Username: username,
+		Name:     name,
+		Password: hashPassword,
+	}
+
+	tx := u.db.Create(&user)
+
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	return nil
 }
 
 // Authenticate get user based on username and password

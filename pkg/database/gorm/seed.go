@@ -64,7 +64,7 @@ func (s *Seeder) Seed() {
 func (s *Seeder) CreateJokes(request JokeCreateRequest) []*models.Joke {
 	jokes := make([]*models.Joke, request.amount)
 	for i := 0; i < request.amount; i++ {
-		jokes[i] = s.factory.CreateJoke()
+		jokes[i] = s.factory.CreateJoke(-1 * i)
 	}
 
 	return jokes
@@ -76,7 +76,7 @@ func (s *Seeder) CreateUsers(request UserCreateRequest) []*models.User {
 	for i := 0; i < request.amount; i++ {
 		user := s.factory.CreateUser()
 		for j := 0; j < request.favourites; j++ {
-			joke := s.factory.CreateJoke()
+			joke := s.factory.CreateJoke(-1 * j)
 			user.Favourites = append(user.Favourites, *joke)
 		}
 		users[i] = user
@@ -91,7 +91,7 @@ func (s *Seeder) CreateCategories(request CategoryRequest) {
 	for i := 0; i < request.amount; i++ {
 		category := s.factory.CreateCategory(&request.user, nil)
 		for j := 0; j < request.jokes; j++ {
-			joke := s.factory.CreateJoke()
+			joke := s.factory.CreateJoke(-1 * j)
 			category.Jokes = append(category.Jokes, *joke)
 		}
 		s.factory.db.Save(&category)

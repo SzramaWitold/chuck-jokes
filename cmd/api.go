@@ -27,7 +27,7 @@ var rootCmd = &cobra.Command{
 		jwt := di.JWT(
 			os.Getenv("SECRET"),
 			os.Getenv("TTL"), os.Getenv("REFRESH_TTL"))
-		request := requests.NewRequest(di.VALIDATOR())
+		request := requests.NewRequest(di.VALIDATOR(gorm))
 		response := responses.NewResponse()
 		controller := controllers.NewController(gorm, jwt, request, response)
 		middleware := middlewares.NewMiddleware(jwt)
