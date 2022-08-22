@@ -38,3 +38,24 @@ func (cont *Controller) AddToCategory() func(c *gin.Context) {
 		c.JSON(http.StatusOK, cont.Response.NewSuccess("success"))
 	}
 }
+
+func (cont *Controller) SetAccessCategory() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		request, requestErr := cont.Request.NewSetAccess(c)
+
+		if requestErr != nil {
+			c.JSON(http.StatusBadRequest, cont.Response.NewErrorsCollection(requestErr))
+			return
+		}
+		repository := repositories.NewCategory(cont.DB)
+
+		updateAccessErrors := repository.UpdateAccess(request.UserID, request.CategoryID)
+
+		if updateAccessErrors != nil {
+			c.JSON(http.StatusBadRequest, cont.Response.NewError(updateAccessErrors))
+			return
+		}
+
+		c.JSON(http.StatusOK, cont.Response.NewSuccess("success"))
+	}
+}

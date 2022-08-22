@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gorm.io/gorm"
 	"log"
+	"time"
 )
 
 type Category struct {
@@ -53,4 +54,34 @@ func (c *Category) AddToCategory(userId, categoryID, jokeID uint) error {
 	}
 
 	return nil
+}
+
+func (c *Category) UpdateAccess(userId, categoryID uint) error {
+	var category, categoryError = getCategory(userId, categoryID, c.db)
+
+	if categoryError != nil {
+		return categoryError
+	}
+
+	category.Access = time.Now().Add(2 * time.Hour)
+
+	tx := c.db.Save(category)
+
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	return nil
+}
+
+func getCategory(userId, categoryID uint, db *gorm.DB) (*models.Category, error) {
+	var category = models.Category{}
+	db.First(&category, categoryID)
+	if category.ID == 0 {
+		return nil, fmt.Errorf("can not find category with provided ID: %v", categoryID)
+	}
+	if category.UserID != userId {
+		return nil, fmt.Errorf("do not have permission to add joke to this category")
+	}
+	return &category, nil
 }
