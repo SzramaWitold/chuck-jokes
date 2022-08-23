@@ -5,8 +5,8 @@ import (
 )
 
 type CreateCategory struct {
-	UserID uint   `validation:"required,uint"`
-	Name   string `validation:"required"`
+	UserID uint   `validation:"Required,Uint"`
+	Name   string `validation:"Required"`
 }
 
 func (r *Request) NewCreateCategory(c *gin.Context) (*CreateCategory, []error) {

@@ -5,8 +5,8 @@ import (
 )
 
 type AddFavourite struct {
-	UserID uint `validation:"required,uint"`
-	JokeID uint `validation:"required,uint"`
+	UserID uint `validation:"Required,Uint"`
+	JokeID uint `validation:"Required,Uint"`
 }
 
 func (r *Request) NewAddFavouriteRequest(c *gin.Context) (*AddFavourite, []error) {

@@ -15,7 +15,7 @@ func (val *Validator) Required(n, i, o string) error {
 	return nil
 }
 
-func (val *Validator) IsUint(n, i, o string) error {
+func (val *Validator) Uint(n, i, o string) error {
 	if i == "" {
 		return nil
 	}
@@ -58,5 +58,6 @@ func (val *Validator) Unique(n, i, o string) error {
 	if result.Found == true {
 		return fmt.Errorf("%v already taken", n)
 	}
-	return fmt.Errorf("twoja stara")
+
+	return nil
 }

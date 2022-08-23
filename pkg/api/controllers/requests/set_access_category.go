@@ -5,14 +5,14 @@ import (
 )
 
 type SetAccess struct {
-	CategoryID uint `validation:"required,uint"`
-	UserID     uint `validation:"required,uint"`
+	CategoryID uint `validation:"Required,Uint"`
+	UserID     uint `validation:"Required,Uint"`
 }
 
 func (r *Request) NewSetAccess(c *gin.Context) (*SetAccess, []error) {
 	inputParams := map[string]string{
-		"CategoryID": c.Param("CategoryID"),
-		"UserID":     c.Param("CategoryID"),
+		"CategoryID": c.Param("ID"),
+		"UserID":     c.Param("UserID"),
 	}
 
 	var request SetAccess
@@ -22,7 +22,7 @@ func (r *Request) NewSetAccess(c *gin.Context) (*SetAccess, []error) {
 		return nil, errors
 	}
 
-	request.CategoryID = changeToUint(c.Param("CategoryID"))
+	request.CategoryID = changeToUint(c.Param("ID"))
 	request.UserID = changeToUint(c.Param("UserID"))
 
 	return &request, nil

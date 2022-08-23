@@ -10,7 +10,7 @@ type Category struct {
 	gorm.Model
 	Name   string
 	Jokes  []Joke `gorm:"many2many:categories_jokes;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Access time.Time
+	Access *time.Time
 	UserID uint
 	User   User `gorm:"foreignKey:UserID;"`
 }

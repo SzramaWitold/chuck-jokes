@@ -19,6 +19,8 @@ type IController interface {
 	GetJokes() func(c *gin.Context)
 	GetJokeOfADay() func(c *gin.Context)
 	Register() func(c *gin.Context)
+	SetAccessCategory() func(c *gin.Context)
+	GetCategory() func(c *gin.Context)
 }
 
 type Controller struct {

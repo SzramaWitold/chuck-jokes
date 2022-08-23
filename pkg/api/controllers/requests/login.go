@@ -5,8 +5,8 @@ import (
 )
 
 type LoginRequest struct {
-	Username string `validation:"required"`
-	Password string `validation:"required"`
+	Username string `validation:"Required"`
+	Password string `validation:"Required"`
 }
 
 func (r *Request) NewLogin(c *gin.Context) (*LoginRequest, []error) {

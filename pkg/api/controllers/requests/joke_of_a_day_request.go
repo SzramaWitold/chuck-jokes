@@ -5,7 +5,7 @@ import (
 )
 
 type JokeOfADay struct {
-	Date string `validation:"date"`
+	Date string `validation:"Date"`
 }
 
 func (r *Request) NewJokeOfADay(c *gin.Context) (*JokeOfADay, []error) {

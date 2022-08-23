@@ -17,6 +17,7 @@ type IRequest interface {
 	NewJokeOfADay(c *gin.Context) (*JokeOfADay, []error)
 	NewRegister(c *gin.Context) (*Register, []error)
 	NewSetAccess(c *gin.Context) (*SetAccess, []error)
+	NewGetCategory(c *gin.Context) (*GetCategory, []error)
 }
 
 type Request struct {

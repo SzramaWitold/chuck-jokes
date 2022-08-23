@@ -19,6 +19,10 @@ func NewAuthenticationMiddleware(JWT *token.IHandler) *AuthenticationMiddleware 
 func (mid *AuthenticationMiddleware) Auth(c *gin.Context) {
 	const BearerSchema = "Bearer "
 	authHeader := c.GetHeader("Authorization")
+	if authHeader == "" {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, "Unauthenticated")
+		return
+	}
 	tokenString := authHeader[len(BearerSchema):]
 
 	baseJwt := *mid.JWT

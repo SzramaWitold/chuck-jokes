@@ -6,7 +6,7 @@ import (
 
 type Favourites struct {
 	PaginationRequest
-	UserID uint
+	UserID uint `validation:"Required,Uint"`
 }
 
 func (r *Request) NewFavourites(c *gin.Context) (*Favourites, error) {

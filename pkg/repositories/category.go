@@ -37,13 +37,10 @@ func (c *Category) CreateCategory(userID uint, name string) *models.Category {
 }
 
 func (c *Category) AddToCategory(userId, categoryID, jokeID uint) error {
-	var category = models.Category{}
-	c.db.First(&category, categoryID)
-	if category.ID == 0 {
-		return fmt.Errorf("can not find category with provided ID: %v", categoryID)
-	}
-	if category.UserID != userId {
-		return fmt.Errorf("do not have permission to add joke to this category")
+	var category, categoryError = getUserCategory(userId, categoryID, c.db)
+
+	if categoryError != nil {
+		return categoryError
 	}
 
 	var joke = models.Joke{}
@@ -53,17 +50,24 @@ func (c *Category) AddToCategory(userId, categoryID, jokeID uint) error {
 		return fmt.Errorf("joke with provided id: %v not exist", jokeID)
 	}
 
+	updateError := c.db.Model(&category).Association("Jokes").Append(&joke)
+
+	if updateError != nil {
+		return updateError
+	}
+
 	return nil
 }
 
 func (c *Category) UpdateAccess(userId, categoryID uint) error {
-	var category, categoryError = getCategory(userId, categoryID, c.db)
+	var category, categoryError = getUserCategory(userId, categoryID, c.db)
 
 	if categoryError != nil {
 		return categoryError
 	}
 
-	category.Access = time.Now().Add(2 * time.Hour)
+	access := time.Now().Add(2 * time.Hour)
+	category.Access = &access
 
 	tx := c.db.Save(category)
 
@@ -74,7 +78,23 @@ func (c *Category) UpdateAccess(userId, categoryID uint) error {
 	return nil
 }
 
-func getCategory(userId, categoryID uint, db *gorm.DB) (*models.Category, error) {
+func (c *Category) GetCategory(userId, categoryID uint) (*models.Category, error) {
+	var category = models.Category{}
+	c.db.Preload("Jokes").First(&category, categoryID)
+	if category.ID == 0 {
+		return nil, fmt.Errorf("can not find category with provided ID: %v", categoryID)
+	}
+
+	if time.Now().Before(*category.Access) {
+		return &category, nil
+	} else if category.UserID == userId {
+		return &category, nil
+	} else {
+		return nil, fmt.Errorf("do not have permission to get this category")
+	}
+}
+
+func getUserCategory(userId, categoryID uint, db *gorm.DB) (*models.Category, error) {
 	var category = models.Category{}
 	db.First(&category, categoryID)
 	if category.ID == 0 {

@@ -11,7 +11,7 @@ type Category struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt sql.NullTime
-	Access    time.Time
+	Access    *time.Time
 	Name      string
 	Jokes     []Joke `gorm:"many2many:categories_jokes;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	UserID    uint
