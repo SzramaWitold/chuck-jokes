@@ -8,14 +8,14 @@ import (
 	"time"
 )
 
-func (val *Validator) Required(n, i, o string) error {
+func (val *Validator) Required(n, i, _ string) error {
 	if i == "" {
 		return fmt.Errorf("field '%v' required", n)
 	}
 	return nil
 }
 
-func (val *Validator) Uint(n, i, o string) error {
+func (val *Validator) Uint(n, i, _ string) error {
 	if i == "" {
 		return nil
 	}
@@ -32,7 +32,7 @@ func (val *Validator) Uint(n, i, o string) error {
 	return nil
 }
 
-func (val *Validator) Date(n, i, o string) error {
+func (val *Validator) Date(n, i, _ string) error {
 	if i == "" {
 		return nil
 	}
