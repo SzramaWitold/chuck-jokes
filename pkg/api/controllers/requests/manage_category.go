@@ -4,19 +4,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type AddToCategory struct {
+type ManageCategory struct {
 	UserID     uint `validation:"Required,Uint"`
 	CategoryID uint `validation:"Required,Uint"`
 	JokeID     uint `validation:"Required,Uint"`
 }
 
-func (r *Request) NewAddToCategory(c *gin.Context) (*AddToCategory, []error) {
+func (r *Request) NewManageCategory(c *gin.Context) (*ManageCategory, []error) {
 	inputParams := map[string]string{
 		"UserID":     c.Param("UserID"),
 		"JokeID":     c.PostForm("JokeID"),
 		"CategoryID": c.Param("ID"),
 	}
-	request := AddToCategory{}
+	request := ManageCategory{}
 	errors := r.Validator.Validate(request, inputParams)
 	if errors != nil {
 		return nil, errors

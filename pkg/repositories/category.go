@@ -50,7 +50,7 @@ func (c *Category) AddToCategory(userId, categoryID, jokeID uint) error {
 		return fmt.Errorf("joke with provided id: %v not exist", jokeID)
 	}
 
-	updateError := c.db.Model(&category).Association("Jokes").Append(&joke)
+	updateError := c.db.Model(&category).Association("Jokes").Delete(&joke)
 
 	if updateError != nil {
 		return updateError
@@ -87,7 +87,7 @@ func (c *Category) GetCategory(userId, categoryID uint) (*models.Category, error
 
 	if time.Now().Before(*category.Access) {
 		return &category, nil
-	} else if category.UserID == userId {
+	} else if userId != 0 {
 		return &category, nil
 	} else {
 		return nil, fmt.Errorf("do not have permission to get this category")

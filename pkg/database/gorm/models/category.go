@@ -14,8 +14,3 @@ type Category struct {
 	UserID uint
 	User   User `gorm:"foreignKey:UserID;"`
 }
-
-// GetID from Category
-func (c *Category) GetID() uint {
-	return c.ID
-}

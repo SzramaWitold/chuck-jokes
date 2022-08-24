@@ -32,6 +32,43 @@ func (j *Joke) JokeOfTheDay(time string) *models.Joke {
 	return &joke
 }
 
+// GetJoke get joke of the day from specyfi day
+func (j *Joke) GetJoke(jokeID uint) *models.Joke {
+	var joke = models.Joke{}
+	txFind := j.db.First(&joke, jokeID)
+
+	if txFind.Error != nil {
+		log.Println(txFind.Error)
+		return nil
+	}
+
+	joke.Shows++
+
+	txSave := j.db.Save(&joke)
+
+	if txSave.Error != nil {
+		log.Println(txSave.Error)
+		return nil
+	}
+
+	return &joke
+}
+
+// GetJoke get joke of the day from specyfi day
+func (j *Joke) GetStatistic(jokeID uint) (*models.Joke, uint) {
+	var joke = models.Joke{}
+	txFind := j.db.First(&joke, jokeID)
+
+	if txFind.Error != nil {
+		log.Println(txFind.Error)
+		return nil, 0
+	}
+
+	favourites := j.db.Model(&joke).Association("Users").Count()
+
+	return &joke, uint(favourites)
+}
+
 // GetJokes get all jokes
 func (j *Joke) GetJokes(page, perPage int) *Pagination[models.Joke] {
 	var totalRows int64

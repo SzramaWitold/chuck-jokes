@@ -17,6 +17,7 @@ type IResponse interface {
 	PaginateJokes(repJokes *repositories.Pagination[models.Joke]) *Pagination[Joke]
 	NewSuccess(message string) Success
 	NewCategoryJokes(category *models.Category) CategoryJokes
+	NewJokeStatistic(joke *models.Joke, favAmount uint) JokeStatistic
 }
 type Response struct{}
 

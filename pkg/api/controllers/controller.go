@@ -21,6 +21,9 @@ type IController interface {
 	Register() func(c *gin.Context)
 	SetAccessCategory() func(c *gin.Context)
 	GetCategory() func(c *gin.Context)
+	RemoveFromCategory() func(c *gin.Context)
+	GetJoke() func(c *gin.Context)
+	GetStatistic() func(c *gin.Context)
 }
 
 type Controller struct {

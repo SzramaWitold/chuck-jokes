@@ -50,6 +50,38 @@ func (cont *Controller) GetJokes() func(c *gin.Context) {
 	}
 }
 
+func (cont *Controller) GetJoke() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		jokeRepository := repositories.NewJoke(cont.DB)
+		request, requestErr := cont.Request.NewJoke(c)
+
+		if requestErr != nil {
+			c.JSON(http.StatusBadRequest, cont.Response.NewErrorsCollection(requestErr))
+			return
+		}
+
+		repJoke := jokeRepository.GetJoke(request.JokeID)
+
+		c.JSON(http.StatusOK, cont.Response.NewJoke(repJoke))
+	}
+}
+
+func (cont *Controller) GetStatistic() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		jokeRepository := repositories.NewJoke(cont.DB)
+		request, requestErr := cont.Request.NewJoke(c)
+
+		if requestErr != nil {
+			c.JSON(http.StatusBadRequest, cont.Response.NewErrorsCollection(requestErr))
+			return
+		}
+
+		repJoke, favNumber := jokeRepository.GetStatistic(request.JokeID)
+
+		c.JSON(http.StatusOK, cont.Response.NewJokeStatistic(repJoke, favNumber))
+	}
+}
+
 func (cont *Controller) GetJokeOfADay() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		jokeRepository := repositories.NewJoke(cont.DB)

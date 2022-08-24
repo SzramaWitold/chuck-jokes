@@ -12,6 +12,7 @@ type Joke struct {
 	gorm.Model
 	Value      string `faker:"sentence"`
 	ExternalID string `gorm:"unique" faker:"unique"`
+	Shows      uint   `gorm:"default:0"`
 }
 
 // Create save joke to database
@@ -22,15 +23,4 @@ func Create(db *gorm.DB, joke *models.Joke) *models.Joke {
 	}
 
 	return joke
-}
-
-// GetID from Joke
-func (j *Joke) GetID() uint {
-	return j.ID
-}
-
-// ExternalJoke for call from external api
-type ExternalJoke struct {
-	Value string `faker:"sentence"`
-	ID    string `gorm:"primaryKey" faker:"unique"`
 }

@@ -11,8 +11,3 @@ type User struct {
 	Favourites []Joke     `gorm:"many2many:jokes_users;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Categories []Category `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
-
-// GetID from User
-func (u *User) GetID() uint {
-	return u.ID
-}
