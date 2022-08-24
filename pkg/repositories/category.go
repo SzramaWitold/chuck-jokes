@@ -8,6 +8,13 @@ import (
 	"time"
 )
 
+type ICategory interface {
+	CreateCategory(userID uint, name string) *models.Category
+	AddToCategory(userId uint, categoryID uint, jokeID uint) error
+	UpdateAccess(userId uint, categoryID uint) error
+	GetCategory(userId uint, categoryID uint) (*models.Category, error)
+}
+
 type Category struct {
 	db *gorm.DB
 }

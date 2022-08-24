@@ -5,6 +5,7 @@ import (
 	"chuck-jokes/pkg/validator"
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 	"time"
 
@@ -16,54 +17,62 @@ import (
 	"gorm.io/gorm"
 )
 
-// Container for dependencies
-type Container struct {
+// container for dependencies
+type container struct {
 	gorm      *gorm.DB
 	scheduler *gocron.Scheduler
 	jwt       token.IHandler
-	validator *validator.Validator
+	validator validator.IValidator
 }
 
-var container = &Container{}
+var cont = &container{}
 
-func VALIDATOR(db *gorm.DB) *validator.Validator {
-	if container.validator == nil {
-		container.validator = validator.NewValidator(db)
+func VALIDATOR(db *gorm.DB) validator.IValidator {
+	if cont.validator == nil {
+		cont.validator = validator.NewValidator(db)
 	}
 
-	return container.validator
+	return cont.validator
 }
 
-func JWT(secret, ttl, refreshTtl string) *token.IHandler {
-	if container.jwt == nil {
-		ttlDuration, refreshTTlDuration := setTTLAndRefresh(ttl, refreshTtl)
-		container.jwt = token.NewHandler(secret, ttlDuration, refreshTTlDuration)
+func JWT() *token.IHandler {
+	if cont.jwt == nil {
+		cont.jwt = token.NewHandler(
+			os.Getenv("SECRET"),
+			mustGetIntegerEnvironmentValue(os.Getenv("TTL"), 5),
+			mustGetIntegerEnvironmentValue(os.Getenv("REFRESH_TTL"), 15))
 	}
 
-	return &container.jwt
+	return &cont.jwt
 }
 
 // GORM get gorm db connection
-func GORM(user, password, host, port, name string) *gorm.DB {
-	if container.gorm == nil {
-		container.gorm = openConnection(user, password, host, port, name)
+func GORM() *gorm.DB {
+	if cont.gorm == nil {
+
+		cont.gorm = openConnection(
+			os.Getenv("DB_USER"),
+			os.Getenv("DB_PASSWORD"),
+			os.Getenv("DB_HOST"),
+			os.Getenv("DB_PORT"),
+			os.Getenv("DB_NAME"))
 	}
 
-	return container.gorm
+	return cont.gorm
 }
 
 // Scheduler go crone scheduler connection
 func Scheduler() *gocron.Scheduler {
-	if container.scheduler == nil {
-		container.scheduler = gocron.NewScheduler(time.UTC)
+	if cont.scheduler == nil {
+		cont.scheduler = gocron.NewScheduler(time.UTC)
 	}
 
-	return container.scheduler
+	return cont.scheduler
 }
 
 //OpenConnection for database inside DB var
 func openConnection(user, password, host, port, name string) *gorm.DB {
-	if container.gorm == nil {
+	if cont.gorm == nil {
 		database, err := gorm.Open(mysql.New(mysql.Config{
 			DSN: getDSN(user, password, host, port, name),
 		}))
@@ -71,11 +80,11 @@ func openConnection(user, password, host, port, name string) *gorm.DB {
 		if err != nil {
 			panic(err)
 		}
-		container.gorm = database
+		cont.gorm = database
 		log.Println("Database connected")
 	}
 
-	return container.gorm
+	return cont.gorm
 }
 
 // getDSN base on .env file
@@ -90,26 +99,16 @@ func getDSN(user, password, host, port, name string) string {
 	)
 }
 
-func setTTLAndRefresh(ttl, refreshTtl string) (int, int) {
-	ttlDuration := 5
-	refreshTTLDuration := 10
-	if ttl != "" {
-		newTTL, ttlErr := strconv.Atoi(ttl)
+func mustGetIntegerEnvironmentValue(val string, def int) int {
+	if val != "" {
+		intVal, ttlErr := strconv.Atoi(val)
 		if ttlErr != nil {
 			log.Println(ttlErr)
-		} else {
-			ttlDuration = newTTL
+			return def
 		}
-	}
 
-	if ttl != "" {
-		newRefreshTTL, ttlErr := strconv.Atoi(refreshTtl)
-		if ttlErr != nil {
-			log.Println(ttlErr)
-		} else {
-			refreshTTLDuration = newRefreshTTL
-		}
+		return intVal
+	} else {
+		return def
 	}
-
-	return ttlDuration, refreshTTLDuration
 }

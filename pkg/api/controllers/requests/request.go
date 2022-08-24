@@ -21,12 +21,12 @@ type IRequest interface {
 	NewJoke(c *gin.Context) (*Joke, []error)
 }
 
-type Request struct {
-	Validator *validator.Validator
+type RequestValidator struct {
+	Validator validator.IValidator
 }
 
-func NewRequest(validator *validator.Validator) *Request {
-	return &Request{
+func NewRequestValidator(validator validator.IValidator) *RequestValidator {
+	return &RequestValidator{
 		Validator: validator,
 	}
 }

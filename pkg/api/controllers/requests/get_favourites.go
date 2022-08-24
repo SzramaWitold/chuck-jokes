@@ -9,7 +9,7 @@ type Favourites struct {
 	UserID uint `validation:"Required,Uint"`
 }
 
-func (r *Request) NewFavourites(c *gin.Context) (*Favourites, error) {
+func (r *RequestValidator) NewFavourites(c *gin.Context) (*Favourites, error) {
 	userID, userIDErr := validateTokenUser(c)
 
 	if userIDErr != nil {

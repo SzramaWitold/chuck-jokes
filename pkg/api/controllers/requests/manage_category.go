@@ -10,7 +10,7 @@ type ManageCategory struct {
 	JokeID     uint `validation:"Required,Uint"`
 }
 
-func (r *Request) NewManageCategory(c *gin.Context) (*ManageCategory, []error) {
+func (r *RequestValidator) NewManageCategory(c *gin.Context) (*ManageCategory, []error) {
 	inputParams := map[string]string{
 		"UserID":     c.Param("UserID"),
 		"JokeID":     c.PostForm("JokeID"),

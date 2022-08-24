@@ -7,9 +7,9 @@ import (
 	"chuck-jokes/pkg/api/controllers/requests"
 	"chuck-jokes/pkg/api/controllers/responses"
 	"chuck-jokes/pkg/api/middlewares"
+	"chuck-jokes/pkg/repositories"
 	"github.com/spf13/cobra"
 	"log"
-	"os"
 )
 
 var rootCmd = &cobra.Command{
@@ -17,19 +17,12 @@ var rootCmd = &cobra.Command{
 	Short: "Create and get server",
 	Long:  `Create and get server for chuck noris jokes application`,
 	Run: func(_ *cobra.Command, _ []string) {
-		gorm := di.GORM(
-			os.Getenv("DB_USER"),
-			os.Getenv("DB_PASSWORD"),
-			os.Getenv("DB_HOST"),
-			os.Getenv("DB_PORT"),
-			os.Getenv("DB_NAME"),
-		)
-		jwt := di.JWT(
-			os.Getenv("SECRET"),
-			os.Getenv("TTL"), os.Getenv("REFRESH_TTL"))
-		request := requests.NewRequest(di.VALIDATOR(gorm))
+		gorm := di.GORM()
+		jwt := di.JWT()
+		request := requests.NewRequestValidator(di.VALIDATOR(gorm))
 		response := responses.NewResponse()
-		controller := controllers.NewController(gorm, jwt, request, response)
+		repository := repositories.NewRepository(gorm)
+		controller := controllers.NewController(jwt, request, response, repository)
 		middleware := middlewares.NewMiddleware(jwt)
 
 		server := api.StartEngine(controller, middleware)

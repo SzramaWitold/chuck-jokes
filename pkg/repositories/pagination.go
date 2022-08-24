@@ -35,7 +35,7 @@ func (p *Pagination[T]) UpdateSettings(page, perPage int) *Pagination[T] {
 	return p
 }
 
-// PopulateData populate pagination struct with database data
+// PopulateData populate Pagination struct with database data
 func (p *Pagination[T]) PopulateData(totalRows int64, rows []T) *Pagination[T] {
 	p.TotalRows = totalRows
 	p.TotalPages = int(math.Ceil(float64(totalRows) / float64(p.PerPage)))

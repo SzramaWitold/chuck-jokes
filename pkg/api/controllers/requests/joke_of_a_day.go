@@ -8,7 +8,7 @@ type JokeOfADay struct {
 	Date string `validation:"Date"`
 }
 
-func (r *Request) NewJokeOfADay(c *gin.Context) (*JokeOfADay, []error) {
+func (r *RequestValidator) NewJokeOfADay(c *gin.Context) (*JokeOfADay, []error) {
 	inputParams := map[string]string{
 		"Date": c.Query("date"),
 	}

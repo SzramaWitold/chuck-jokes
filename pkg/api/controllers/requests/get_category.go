@@ -9,7 +9,7 @@ type GetCategory struct {
 	CategoryID uint `validation:"Required,Uint"`
 }
 
-func (r *Request) NewGetCategory(c *gin.Context) (*GetCategory, []error) {
+func (r *RequestValidator) NewGetCategory(c *gin.Context) (*GetCategory, []error) {
 	inputParams := map[string]string{
 		"UserID":     c.Param("UserID"),
 		"CategoryID": c.Param("ID"),

@@ -9,7 +9,7 @@ type SetAccess struct {
 	UserID     uint `validation:"Required,Uint"`
 }
 
-func (r *Request) NewSetAccess(c *gin.Context) (*SetAccess, []error) {
+func (r *RequestValidator) NewSetAccess(c *gin.Context) (*SetAccess, []error) {
 	inputParams := map[string]string{
 		"CategoryID": c.Param("ID"),
 		"UserID":     c.Param("UserID"),

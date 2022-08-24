@@ -11,7 +11,7 @@ type PaginationRequest struct {
 	PerPage int
 }
 
-func (r *Request) NewPagination(c *gin.Context) PaginationRequest {
+func (r *RequestValidator) NewPagination(c *gin.Context) PaginationRequest {
 	page, perPage := getPaginationSetup(c)
 	return PaginationRequest{
 		Page:    page,

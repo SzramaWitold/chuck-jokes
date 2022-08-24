@@ -9,6 +9,15 @@ import (
 	"gorm.io/gorm"
 )
 
+type IJoke interface {
+	JokeOfTheDay(time string) *models.Joke
+	GetJoke(jokeID uint) *models.Joke
+	GetStatistic(jokeID uint) (*models.Joke, uint)
+	GetJokes(page int, perPage int) *Pagination[models.Joke]
+	JokeExistInLastMonth(joke *models.Joke) bool
+	GetFavourites(page int, perPage int, userID uint) *Pagination[models.Joke]
+}
+
 // Joke base joke repository
 type Joke struct {
 	db *gorm.DB
@@ -21,7 +30,7 @@ func NewJoke(db *gorm.DB) *Joke {
 	}
 }
 
-// JokeOfTheDay get joke of the day from specyfi day
+// JokeOfTheDay get joke of the day from specify day
 func (j *Joke) JokeOfTheDay(time string) *models.Joke {
 	var joke = models.Joke{}
 	j.db.Where("created_at >= ?", time).First(&joke)
@@ -54,7 +63,7 @@ func (j *Joke) GetJoke(jokeID uint) *models.Joke {
 	return &joke
 }
 
-// GetJoke get joke of the day from specyfi day
+// GetStatistic get statistic for joke
 func (j *Joke) GetStatistic(jokeID uint) (*models.Joke, uint) {
 	var joke = models.Joke{}
 	txFind := j.db.First(&joke, jokeID)

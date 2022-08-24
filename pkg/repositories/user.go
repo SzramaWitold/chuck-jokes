@@ -8,6 +8,13 @@ import (
 	"gorm.io/gorm"
 )
 
+type IUser interface {
+	Register(name string, username string, password string) error
+	Authenticate(username string, password string) *models.User
+	GetUserFromToken(id int) *models.User
+	AddFavourite(userID uint, jokeID uint) error
+}
+
 // User base user repository
 type User struct {
 	db *gorm.DB

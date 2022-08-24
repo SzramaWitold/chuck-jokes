@@ -9,7 +9,7 @@ type LoginRequest struct {
 	Password string `validation:"Required"`
 }
 
-func (r *Request) NewLogin(c *gin.Context) (*LoginRequest, []error) {
+func (r *RequestValidator) NewLogin(c *gin.Context) (*LoginRequest, []error) {
 	inputParams := map[string]string{
 		"Username": c.PostForm("Username"),
 		"Password": c.PostForm("Password"),

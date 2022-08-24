@@ -8,7 +8,7 @@ type Register struct {
 	Password string `validation:"Required"`
 }
 
-func (r *Request) NewRegister(c *gin.Context) (*Register, []error) {
+func (r *RequestValidator) NewRegister(c *gin.Context) (*Register, []error) {
 	inputParams := map[string]string{
 		"Name":     c.PostForm("Name"),
 		"Username": c.PostForm("Username"),

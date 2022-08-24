@@ -7,6 +7,15 @@ import (
 	"strings"
 )
 
+type IValidator interface {
+	getRules(name string, input string, rules ...string) []error
+	Validate(request interface{}, inputs map[string]string) []error
+	Required(n string, i string, _ string) error
+	Uint(n string, i string, _ string) error
+	Date(n string, i string, _ string) error
+	Unique(n string, i string, o string) error
+}
+
 type Validator struct {
 	db *gorm.DB
 }

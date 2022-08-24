@@ -8,7 +8,7 @@ type Joke struct {
 	JokeID uint `validation:"Required,Uint"`
 }
 
-func (r *Request) NewJoke(c *gin.Context) (*Joke, []error) {
+func (r *RequestValidator) NewJoke(c *gin.Context) (*Joke, []error) {
 	inputParams := map[string]string{
 		"JokeID": c.Param("ID"),
 	}

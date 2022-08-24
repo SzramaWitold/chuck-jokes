@@ -1,7 +1,6 @@
 package models
 
 import (
-	"database/sql"
 	"time"
 )
 
@@ -10,7 +9,6 @@ type User struct {
 	ID         uint
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
-	DeletedAt  sql.NullTime
 	Name       string     `faker:"name"`
 	Username   string     `faker:"email,unique"`
 	Password   string     `faker:"password"`

@@ -9,7 +9,7 @@ type CreateCategory struct {
 	Name   string `validation:"Required"`
 }
 
-func (r *Request) NewCreateCategory(c *gin.Context) (*CreateCategory, []error) {
+func (r *RequestValidator) NewCreateCategory(c *gin.Context) (*CreateCategory, []error) {
 
 	inputParams := map[string]string{
 		"UserID": c.Param("UserID"),

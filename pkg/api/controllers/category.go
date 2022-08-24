@@ -1,21 +1,19 @@
 package controllers
 
 import (
-	"chuck-jokes/pkg/repositories"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 func (cont *Controller) CreateCategory() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		repository := repositories.NewCategory(cont.DB)
 		request, requestErr := cont.Request.NewCreateCategory(c)
 		if requestErr != nil {
 			c.JSON(http.StatusBadRequest, cont.Response.NewErrorsCollection(requestErr))
 			return
 		}
 
-		category := repository.CreateCategory(request.UserID, request.Name)
+		category := cont.Repository.Category.CreateCategory(request.UserID, request.Name)
 		c.JSON(http.StatusOK, cont.Response.NewCategory(category))
 	}
 }
@@ -27,8 +25,8 @@ func (cont *Controller) AddToCategory() func(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, cont.Response.NewErrorsCollection(requestErr))
 			return
 		}
-		repository := repositories.NewCategory(cont.DB)
-		addError := repository.AddToCategory(request.UserID, request.CategoryID, request.JokeID)
+
+		addError := cont.Repository.Category.AddToCategory(request.UserID, request.CategoryID, request.JokeID)
 
 		if addError != nil {
 			c.JSON(http.StatusBadRequest, cont.Response.NewError(addError))
@@ -46,8 +44,7 @@ func (cont *Controller) RemoveFromCategory() func(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, cont.Response.NewErrorsCollection(requestErr))
 			return
 		}
-		repository := repositories.NewCategory(cont.DB)
-		addError := repository.AddToCategory(request.UserID, request.CategoryID, request.JokeID)
+		addError := cont.Repository.Category.AddToCategory(request.UserID, request.CategoryID, request.JokeID)
 
 		if addError != nil {
 			c.JSON(http.StatusBadRequest, cont.Response.NewError(addError))
@@ -66,9 +63,8 @@ func (cont *Controller) SetAccessCategory() func(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, cont.Response.NewErrorsCollection(requestErr))
 			return
 		}
-		repository := repositories.NewCategory(cont.DB)
 
-		updateAccessErrors := repository.UpdateAccess(request.UserID, request.CategoryID)
+		updateAccessErrors := cont.Repository.Category.UpdateAccess(request.UserID, request.CategoryID)
 
 		if updateAccessErrors != nil {
 			c.JSON(http.StatusBadRequest, cont.Response.NewError(updateAccessErrors))
@@ -87,9 +83,8 @@ func (cont *Controller) GetCategory() func(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, cont.Response.NewErrorsCollection(requestErr))
 			return
 		}
-		repository := repositories.NewCategory(cont.DB)
 
-		category, categoryError := repository.GetCategory(request.UserID, request.CategoryID)
+		category, categoryError := cont.Repository.Category.GetCategory(request.UserID, request.CategoryID)
 
 		if categoryError != nil {
 			c.JSON(http.StatusBadRequest, cont.Response.NewError(categoryError))

@@ -3,45 +3,56 @@ package controllers
 import (
 	"chuck-jokes/pkg/api/controllers/requests"
 	"chuck-jokes/pkg/api/controllers/responses"
+	"chuck-jokes/pkg/repositories"
 	"chuck-jokes/pkg/token"
 	"github.com/gin-gonic/gin"
-
-	"gorm.io/gorm"
 )
 
-type IController interface {
+type ICategory interface {
 	CreateCategory() func(c *gin.Context)
 	AddToCategory() func(c *gin.Context)
+	SetAccessCategory() func(c *gin.Context)
+	RemoveFromCategory() func(c *gin.Context)
+	GetCategory() func(c *gin.Context)
+}
+
+type IUser interface {
 	GetMe() func(c *gin.Context)
 	Login() func(c *gin.Context)
 	GetFavourites() func(c *gin.Context)
 	AddFavourite() func(c *gin.Context)
+	Register() func(c *gin.Context)
+}
+
+type IJoke interface {
 	GetJokes() func(c *gin.Context)
 	GetJokeOfADay() func(c *gin.Context)
-	Register() func(c *gin.Context)
-	SetAccessCategory() func(c *gin.Context)
-	GetCategory() func(c *gin.Context)
-	RemoveFromCategory() func(c *gin.Context)
 	GetJoke() func(c *gin.Context)
 	GetStatistic() func(c *gin.Context)
 }
 
+type IController interface {
+	ICategory
+	IUser
+	IJoke
+}
+
 type Controller struct {
-	DB       *gorm.DB
-	Request  requests.IRequest
-	Response responses.IResponse
-	JWT      *token.IHandler
+	Request    requests.IRequest
+	Response   responses.IResponse
+	JWT        *token.IHandler
+	Repository *repositories.Repository
 }
 
 func NewController(
-	db *gorm.DB,
 	jwt *token.IHandler,
 	request requests.IRequest,
-	response responses.IResponse) *Controller {
+	response responses.IResponse,
+	repository *repositories.Repository) *Controller {
 	return &Controller{
-		DB:       db,
-		Request:  request,
-		Response: response,
-		JWT:      jwt,
+		Request:    request,
+		Response:   response,
+		JWT:        jwt,
+		Repository: repository,
 	}
 }

@@ -9,7 +9,7 @@ type AddFavourite struct {
 	JokeID uint `validation:"Required,Uint"`
 }
 
-func (r *Request) NewAddFavouriteRequest(c *gin.Context) (*AddFavourite, []error) {
+func (r *RequestValidator) NewAddFavouriteRequest(c *gin.Context) (*AddFavourite, []error) {
 	inputParams := map[string]string{
 		"UserID": c.Param("UserID"),
 		"JokeID": c.PostForm("JokeID"),

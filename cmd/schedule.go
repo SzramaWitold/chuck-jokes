@@ -24,13 +24,7 @@ var schedulerCmd = &cobra.Command{
 	Long:  `Schedule everything inside crone package`,
 	Run: func(_ *cobra.Command, _ []string) {
 
-		gorm := di.GORM(
-			os.Getenv("DB_USER"),
-			os.Getenv("DB_PASSWORD"),
-			os.Getenv("DB_HOST"),
-			os.Getenv("DB_PORT"),
-			os.Getenv("DB_NAME"),
-		)
+		gorm := di.GORM()
 		scheduler := di.Scheduler()
 		callSchedules(scheduler, gorm)
 		scheduler.StartBlocking()
@@ -51,6 +45,7 @@ func scheduleRandomJoke(db *gorm.DB, external func() *models.Joke) func() {
 		joke := external()
 		if JokeRepository.JokeExistInLastMonth(joke) {
 			scheduleRandomJoke(db, external)
+
 			return
 		}
 
