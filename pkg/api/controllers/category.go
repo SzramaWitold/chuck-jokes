@@ -5,6 +5,17 @@ import (
 	"net/http"
 )
 
+// CreateCategory godoc
+// @Summary      CreateCategory
+// @Description  Create new user category
+// @Tags         Category
+// @Accept       json
+// @Produce      json
+// @Param        Name    formData     string  true  "Name"
+// @Param Authorization header string true "With the bearer started"
+// @Success      200  {object} responses.Category
+// @Failure      400  {array}  responses.Error
+// @Router       /categories [post]
 func (cont *Controller) CreateCategory() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		request, requestErr := cont.Request.NewCreateCategory(c)
@@ -18,6 +29,18 @@ func (cont *Controller) CreateCategory() func(c *gin.Context) {
 	}
 }
 
+// AddToCategory godoc
+// @Summary      AddToCategory
+// @Description  Add joke to category
+// @Tags         Category
+// @Accept       json
+// @Produce      json
+// @Param        JokeID    formData     number  true  "JokeID"
+// @Param Authorization header string true "With the bearer started"
+// @Success      200  {object} responses.Success
+// @Failure      400  {object}  responses.Error
+// @Failure      400  {array}  responses.Error
+// @Router       /categories/{ID} [put]
 func (cont *Controller) AddToCategory() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		request, requestErr := cont.Request.NewManageCategory(c)
@@ -37,6 +60,18 @@ func (cont *Controller) AddToCategory() func(c *gin.Context) {
 	}
 }
 
+// RemoveFromCategory godoc
+// @Summary      RemoveFromCategory
+// @Description  Remove joke to category
+// @Tags         Category
+// @Accept       json
+// @Produce      json
+// @Param        JokeID    formData     number  true  "JokeID"
+// @Param Authorization header string true "With the bearer started"
+// @Success      200  {object} responses.Success
+// @Failure      400  {object}  responses.Error
+// @Failure      400  {array}  responses.Error
+// @Router       /categories/{ID} [delete]
 func (cont *Controller) RemoveFromCategory() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		request, requestErr := cont.Request.NewManageCategory(c)
@@ -55,6 +90,17 @@ func (cont *Controller) RemoveFromCategory() func(c *gin.Context) {
 	}
 }
 
+// SetAccessCategory godoc
+// @Summary      SetAccessCategory
+// @Description  Set time limit access for guest
+// @Tags         Category
+// @Accept       json
+// @Produce      json
+// @Param Authorization header string true "With the bearer started"
+// @Success      200  {object} responses.Success
+// @Failure      400  {object}  responses.Error
+// @Failure      400  {array}  responses.Error
+// @Router       /categories/{ID}/access [put]
 func (cont *Controller) SetAccessCategory() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		request, requestErr := cont.Request.NewSetAccess(c)
@@ -75,6 +121,18 @@ func (cont *Controller) SetAccessCategory() func(c *gin.Context) {
 	}
 }
 
+// GetCategory godoc
+// @Summary      GetCategory
+// @Description  get category with jokes if access is set then for everyone otherwise for logged user only
+// @Tags         Category
+// @Accept       json
+// @Produce      json
+// @Param        Name    formData     string  true  "Name"
+// @Param Authorization header string false "With the bearer started"
+// @Success      200  {object} responses.Category
+// @Failure      400  {object}  responses.Error
+// @Failure      400  {array}  responses.Error
+// @Router       /categories/{ID} [get]
 func (cont *Controller) GetCategory() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		request, requestErr := cont.Request.NewGetCategory(c)

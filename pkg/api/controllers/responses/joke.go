@@ -22,6 +22,15 @@ func (r *Response) NewJoke(joke *models.Joke) Joke {
 	}
 }
 
+// PaginateJokes required for swagger todo remove after swagger allow generics inside comments
+type PaginateJokes struct {
+	Page       int
+	PerPage    int
+	TotalRows  int64
+	TotalPages int
+	Rows       []Joke
+}
+
 func (r *Response) NewJokeCollection(jokes []models.Joke) []Joke {
 	var jokesCollection []Joke
 
@@ -32,6 +41,12 @@ func (r *Response) NewJokeCollection(jokes []models.Joke) []Joke {
 	return jokesCollection
 }
 
-func (r *Response) PaginateJokes(repJokes *repositories.Pagination[models.Joke]) *Pagination[Joke] {
-	return ResponsePagination[Joke](repJokes.Page, repJokes.PerPage, repJokes.TotalRows, repJokes.TotalPages, r.NewJokeCollection(repJokes.Rows))
+func (r *Response) NewPaginateJokes(
+	repJokes *repositories.Pagination[models.Joke]) *Pagination[Joke] {
+	return ResponsePagination[Joke](
+		repJokes.Page,
+		repJokes.PerPage,
+		repJokes.TotalRows,
+		repJokes.TotalPages,
+		r.NewJokeCollection(repJokes.Rows))
 }

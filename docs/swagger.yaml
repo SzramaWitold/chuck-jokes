@@ -1,0 +1,485 @@
+basePath: /
+definitions:
+  responses.Category:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      userID:
+        type: integer
+    type: object
+  responses.Error:
+    properties:
+      message:
+        type: string
+    type: object
+  responses.Joke:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      updatedAt:
+        type: string
+      value:
+        type: string
+    type: object
+  responses.JokeStatistic:
+    properties:
+      createdAt:
+        type: string
+      favourite:
+        type: integer
+      id:
+        type: integer
+      shows:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  responses.PaginateJokes:
+    properties:
+      page:
+        type: integer
+      perPage:
+        type: integer
+      rows:
+        items:
+          $ref: '#/definitions/responses.Joke'
+        type: array
+      totalPages:
+        type: integer
+      totalRows:
+        type: integer
+    type: object
+  responses.Success:
+    properties:
+      message:
+        type: string
+    type: object
+  responses.Token:
+    properties:
+      refreshTTL:
+        type: string
+      token:
+        type: string
+      ttl:
+        type: string
+    type: object
+  responses.User:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updatedAt:
+        type: string
+      username:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Chuck jokes manage api
+  title: Chuck jokes api doc
+  version: "1.0"
+paths:
+  /categories:
+    post:
+      consumes:
+      - application/json
+      description: Create new user category
+      parameters:
+      - description: Name
+        in: formData
+        name: Name
+        required: true
+        type: string
+      - description: With the bearer started
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.Category'
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              $ref: '#/definitions/responses.Error'
+            type: array
+      summary: CreateCategory
+      tags:
+      - Category
+  /categories/{ID}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove joke to category
+      parameters:
+      - description: JokeID
+        in: formData
+        name: JokeID
+        required: true
+        type: number
+      - description: With the bearer started
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.Success'
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              $ref: '#/definitions/responses.Error'
+            type: array
+      summary: RemoveFromCategory
+      tags:
+      - Category
+    get:
+      consumes:
+      - application/json
+      description: get category with jokes if access is set then for everyone otherwise
+        for logged user only
+      parameters:
+      - description: Name
+        in: formData
+        name: Name
+        required: true
+        type: string
+      - description: With the bearer started
+        in: header
+        name: Authorization
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.Category'
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              $ref: '#/definitions/responses.Error'
+            type: array
+      summary: GetCategory
+      tags:
+      - Category
+    put:
+      consumes:
+      - application/json
+      description: Add joke to category
+      parameters:
+      - description: JokeID
+        in: formData
+        name: JokeID
+        required: true
+        type: number
+      - description: With the bearer started
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.Success'
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              $ref: '#/definitions/responses.Error'
+            type: array
+      summary: AddToCategory
+      tags:
+      - Category
+  /categories/{ID}/access:
+    put:
+      consumes:
+      - application/json
+      description: Set time limit access for guest
+      parameters:
+      - description: With the bearer started
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.Success'
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              $ref: '#/definitions/responses.Error'
+            type: array
+      summary: SetAccessCategory
+      tags:
+      - Category
+  /favourite:
+    get:
+      consumes:
+      - application/json
+      description: get user favourites jokes
+      parameters:
+      - description: With the bearer started
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.PaginateJokes'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.Error'
+      summary: GetFavourites
+      tags:
+      - User
+    put:
+      consumes:
+      - application/json
+      description: Add new favourite joke
+      parameters:
+      - description: JokeID
+        in: formData
+        name: JokeID
+        required: true
+        type: number
+      - description: With the bearer started
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.Success'
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              $ref: '#/definitions/responses.Error'
+            type: array
+        "417":
+          description: Expectation Failed
+          schema:
+            $ref: '#/definitions/responses.Error'
+      summary: AddFavourite
+      tags:
+      - User
+  /jokeoftheday:
+    get:
+      consumes:
+      - application/json
+      description: get current joke of a day
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.Joke'
+        "401":
+          description: Unauthorized
+          schema:
+            items:
+              $ref: '#/definitions/responses.Error'
+            type: array
+      summary: GetJokeOfADay
+      tags:
+      - Joke
+  /jokes:
+    get:
+      consumes:
+      - application/json
+      description: Get list of jokes
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.PaginateJokes'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.Error'
+      summary: GetJokes
+      tags:
+      - Joke
+  /jokes/{ID}:
+    get:
+      consumes:
+      - application/json
+      description: get specify joke
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.Joke'
+        "401":
+          description: Unauthorized
+          schema:
+            items:
+              $ref: '#/definitions/responses.Error'
+            type: array
+      summary: GetJoke
+      tags:
+      - Joke
+  /jokes/{ID}/statistic:
+    get:
+      consumes:
+      - application/json
+      description: get statistic of the specify joke
+      parameters:
+      - description: With the bearer started
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.JokeStatistic'
+        "401":
+          description: Unauthorized
+          schema:
+            items:
+              $ref: '#/definitions/responses.Error'
+            type: array
+      summary: GetStatistic
+      tags:
+      - Joke
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: get JWT token
+      parameters:
+      - description: Username
+        in: formData
+        name: Username
+        required: true
+        type: string
+      - description: Password
+        in: formData
+        name: Password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.Token'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.Error'
+      summary: Login
+      tags:
+      - User
+  /me:
+    get:
+      consumes:
+      - application/json
+      description: get information about user
+      parameters:
+      - description: With the bearer started
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.User'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.Error'
+      summary: GetMe
+      tags:
+      - User
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: create new user
+      parameters:
+      - description: Username
+        in: formData
+        name: Username
+        required: true
+        type: string
+      - description: Name
+        in: formData
+        name: Name
+        required: true
+        type: string
+      - description: Password
+        in: formData
+        name: Password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.Success'
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              $ref: '#/definitions/responses.Error'
+            type: array
+      summary: Register
+      tags:
+      - User
+swagger: "2.0"

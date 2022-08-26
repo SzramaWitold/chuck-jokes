@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type UserResponse struct {
+type User struct {
 	ID        uint
 	CreatedAt *time.Time
 	UpdatedAt *time.Time
@@ -13,8 +13,8 @@ type UserResponse struct {
 	Username  string
 }
 
-func (r *Response) NewUserResponse(user *models.User) UserResponse {
-	return UserResponse{
+func (r *Response) NewUser(user *models.User) User {
+	return User{
 		ID:        user.ID,
 		CreatedAt: &user.CreatedAt,
 		UpdatedAt: &user.UpdatedAt,

@@ -1,9 +1,12 @@
 package api
 
 import (
+	_ "chuck-jokes/docs"
 	"chuck-jokes/pkg/api/controllers"
 	"chuck-jokes/pkg/api/middlewares"
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // Server base gin server
@@ -21,6 +24,6 @@ func StartEngine(controller *controllers.Controller, middleware *middlewares.Mid
 		Middleware: middleware,
 	}
 	server.setRoutes()
-
+	server.Engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	return server
 }

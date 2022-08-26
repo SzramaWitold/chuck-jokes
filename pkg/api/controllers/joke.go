@@ -7,45 +7,33 @@ import (
 	"net/http"
 )
 
-func (cont *Controller) GetFavourites() func(c *gin.Context) {
-	return func(c *gin.Context) {
-		request, requestErr := cont.Request.NewFavourites(c)
-		if requestErr != nil {
-			c.JSON(http.StatusBadRequest, cont.Response.NewError(requestErr))
-		}
-		jokes := cont.Repository.Joke.GetFavourites(request.Page, request.PerPage, request.UserID)
-
-		c.JSON(http.StatusOK, cont.Response.PaginateJokes(jokes))
-	}
-}
-
-func (cont *Controller) AddFavourite() func(c *gin.Context) {
-	return func(c *gin.Context) {
-		request, requestErr := cont.Request.NewAddFavouriteRequest(c)
-		if requestErr != nil {
-			c.JSON(http.StatusBadRequest, cont.Response.NewErrorsCollection(requestErr))
-			return
-		} else {
-			repErr := cont.Repository.User.AddFavourite(request.UserID, request.JokeID)
-
-			if repErr != nil {
-				c.JSON(http.StatusExpectationFailed, repErr.Error())
-				return
-			}
-			c.JSON(http.StatusOK, cont.Response.NewSuccess("success"))
-		}
-	}
-}
-
+// GetJokes godoc
+// @Summary      GetJokes
+// @Description  Get list of jokes
+// @Tags         Joke
+// @Accept       json
+// @Produce      json
+// @Success      200  {object} responses.PaginateJokes
+// @Failure      401  {object}  responses.Error
+// @Router       /jokes [get]
 func (cont *Controller) GetJokes() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		pagRequest := cont.Request.NewPagination(c)
 		repJokes := cont.Repository.Joke.GetJokes(pagRequest.Page, pagRequest.PerPage)
 
-		c.JSON(http.StatusOK, cont.Response.PaginateJokes(repJokes))
+		c.JSON(http.StatusOK, cont.Response.NewPaginateJokes(repJokes))
 	}
 }
 
+// GetJoke godoc
+// @Summary      GetJoke
+// @Description  get specify joke
+// @Tags         Joke
+// @Accept       json
+// @Produce      json
+// @Success      200  {object} responses.Joke
+// @Failure      401  {array}  responses.Error
+// @Router       /jokes/{ID} [get]
 func (cont *Controller) GetJoke() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		request, requestErr := cont.Request.NewJoke(c)
@@ -61,6 +49,16 @@ func (cont *Controller) GetJoke() func(c *gin.Context) {
 	}
 }
 
+// GetStatistic godoc
+// @Summary      GetStatistic
+// @Description  get statistic of the specify joke
+// @Tags         Joke
+// @Accept       json
+// @Produce      json
+// @Param Authorization header string true "With the bearer started"
+// @Success      200  {object} responses.JokeStatistic
+// @Failure      401  {array}  responses.Error
+// @Router       /jokes/{ID}/statistic [get]
 func (cont *Controller) GetStatistic() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		request, requestErr := cont.Request.NewJoke(c)
@@ -76,6 +74,15 @@ func (cont *Controller) GetStatistic() func(c *gin.Context) {
 	}
 }
 
+// GetJokeOfADay godoc
+// @Summary      GetJokeOfADay
+// @Description  get current joke of a day
+// @Tags         Joke
+// @Accept       json
+// @Produce      json
+// @Success      200  {object} responses.Joke
+// @Failure      401  {array}  responses.Error
+// @Router       /jokeoftheday [get]
 func (cont *Controller) GetJokeOfADay() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		request, requestErr := cont.Request.NewJokeOfADay(c)
