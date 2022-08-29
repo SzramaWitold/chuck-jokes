@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type IJoke interface {
+type JokeRepository interface {
 	JokeOfTheDay(time string) *models.Joke
 	GetJoke(jokeID uint) *models.Joke
 	GetStatistic(jokeID uint) (*models.Joke, uint)

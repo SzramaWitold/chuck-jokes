@@ -12,7 +12,7 @@ import (
 // Server base gin server
 type Server struct {
 	Engine     *gin.Engine
-	Controller controllers.IController
+	Controller controllers.ControllerHandler
 	Middleware *middlewares.Middleware
 }
 

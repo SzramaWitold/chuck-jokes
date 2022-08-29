@@ -9,10 +9,10 @@ import (
 )
 
 type AuthenticationMiddleware struct {
-	JWT *token.IHandler
+	JWT *token.TokenHandler
 }
 
-func NewAuthenticationMiddleware(JWT *token.IHandler) *AuthenticationMiddleware {
+func NewAuthenticationMiddleware(JWT *token.TokenHandler) *AuthenticationMiddleware {
 	return &AuthenticationMiddleware{JWT: JWT}
 }
 

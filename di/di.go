@@ -21,7 +21,7 @@ import (
 type container struct {
 	gorm      *gorm.DB
 	scheduler *gocron.Scheduler
-	jwt       token.IHandler
+	jwt       token.TokenHandler
 	validator *validator.Validate
 }
 
@@ -35,7 +35,7 @@ func VALIDATOR() *validator.Validate {
 	return cont.validator
 }
 
-func JWT() *token.IHandler {
+func JWT() *token.TokenHandler {
 	if cont.jwt == nil {
 		cont.jwt = token.NewHandler(
 			os.Getenv("SECRET"),

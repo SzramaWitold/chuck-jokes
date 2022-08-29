@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type IUser interface {
+type UserRepository interface {
 	Register(name string, username string, password string) error
 	Authenticate(username string, password string) *models.User
 	GetUserFromToken(id int) *models.User

@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type IResponse interface {
+type ResponseHandler interface {
 	NewUser(user *models.User) User
 	NewToken(token string, ttl *time.Time, refreshTTL *time.Time) Token
 	NewCategory(category *models.Category) Category

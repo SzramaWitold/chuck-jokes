@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-type IHandler interface {
+type TokenHandler interface {
 	CreateToken(user *models.User) (string, *time.Time, *time.Time)
 	ValidateToken(tokenString string) (*jwt.Token, error)
 }
@@ -20,7 +20,7 @@ type Handler struct {
 	refreshTtl int
 }
 
-func NewHandler(secret string, ttl, refreshTTL int) IHandler {
+func NewHandler(secret string, ttl, refreshTTL int) TokenHandler {
 	return Handler{
 		secret:     []byte(secret),
 		ttl:        ttl,

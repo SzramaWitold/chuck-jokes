@@ -8,6 +8,6 @@ type Middleware struct {
 	Auth *AuthenticationMiddleware
 }
 
-func NewMiddleware(jwt *token.IHandler) *Middleware {
+func NewMiddleware(jwt *token.TokenHandler) *Middleware {
 	return &Middleware{Auth: NewAuthenticationMiddleware(jwt)}
 }

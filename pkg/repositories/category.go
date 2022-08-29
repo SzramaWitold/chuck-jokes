@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-type ICategory interface {
+type CategoryRepository interface {
 	CreateCategory(userID uint, name string) *models.Category
 	AddToCategory(userId uint, categoryID uint, jokeID uint) error
 	UpdateAccess(userId uint, categoryID uint) error

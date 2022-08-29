@@ -3,9 +3,9 @@ package repositories
 import "gorm.io/gorm"
 
 type Repository struct {
-	Category ICategory
-	Joke     IJoke
-	User     IUser
+	Category CategoryRepository
+	Joke     JokeRepository
+	User     UserRepository
 }
 
 func NewRepository(db *gorm.DB) *Repository {

@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-type IRequest interface {
+type RequestHandler interface {
 	NewCreateCategory(c *gin.Context) (*CreateCategory, error)
 	NewLogin(c *gin.Context) (*LoginRequest, error)
 	NewAddFavouriteRequest(c *gin.Context) (*AddFavourite, error)

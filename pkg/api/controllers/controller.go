@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type ICategory interface {
+type CategoryController interface {
 	CreateCategory() func(c *gin.Context)
 	AddToCategory() func(c *gin.Context)
 	SetAccessCategory() func(c *gin.Context)
@@ -16,7 +16,7 @@ type ICategory interface {
 	GetCategory() func(c *gin.Context)
 }
 
-type IUser interface {
+type UserController interface {
 	GetMe() func(c *gin.Context)
 	Login() func(c *gin.Context)
 	GetFavourites() func(c *gin.Context)
@@ -24,30 +24,30 @@ type IUser interface {
 	Register() func(c *gin.Context)
 }
 
-type IJoke interface {
+type JokeController interface {
 	GetJokes() func(c *gin.Context)
 	GetJokeOfADay() func(c *gin.Context)
 	GetJoke() func(c *gin.Context)
 	GetStatistic() func(c *gin.Context)
 }
 
-type IController interface {
-	ICategory
-	IUser
-	IJoke
+type ControllerHandler interface {
+	CategoryController
+	UserController
+	JokeController
 }
 
 type Controller struct {
-	Request    requests.IRequest
-	Response   responses.IResponse
-	JWT        *token.IHandler
+	Request    requests.RequestHandler
+	Response   responses.ResponseHandler
+	JWT        *token.TokenHandler
 	Repository *repositories.Repository
 }
 
 func NewController(
-	jwt *token.IHandler,
-	request requests.IRequest,
-	response responses.IResponse,
+	jwt *token.TokenHandler,
+	request requests.RequestHandler,
+	response responses.ResponseHandler,
 	repository *repositories.Repository) *Controller {
 	return &Controller{
 		Request:    request,
