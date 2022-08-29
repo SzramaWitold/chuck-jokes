@@ -5,24 +5,21 @@ import (
 )
 
 type LoginRequest struct {
-	Username string `validation:"Required"`
-	Password string `validation:"Required"`
+	Username string `validate:"required"`
+	Password string `validate:"required"`
 }
 
-func (r *RequestValidator) NewLogin(c *gin.Context) (*LoginRequest, []error) {
-	inputParams := map[string]string{
-		"Username": c.PostForm("Username"),
-		"Password": c.PostForm("Password"),
-	}
+func (r *RequestValidator) NewLogin(c *gin.Context) (*LoginRequest, error) {
 	var request LoginRequest
-	errors := r.Validator.Validate(request, inputParams)
-
-	if errors != nil {
-		return nil, errors
-	}
 
 	request.Username = c.PostForm("Username")
 	request.Password = c.PostForm("Password")
+
+	requestError := r.Validator.Struct(request)
+
+	if requestError != nil {
+		return nil, requestError
+	}
 
 	return &request, nil
 }

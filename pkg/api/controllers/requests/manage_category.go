@@ -5,26 +5,43 @@ import (
 )
 
 type ManageCategory struct {
-	UserID     uint `validation:"Required,Uint"`
-	CategoryID uint `validation:"Required,Uint"`
-	JokeID     uint `validation:"Required,Uint"`
+	UserID     uint `validate:"required"`
+	CategoryID uint `validate:"required"`
+	JokeID     uint `validate:"required"`
 }
 
-func (r *RequestValidator) NewManageCategory(c *gin.Context) (*ManageCategory, []error) {
-	inputParams := map[string]string{
-		"UserID":     c.Param("UserID"),
-		"JokeID":     c.PostForm("JokeID"),
-		"CategoryID": c.Param("ID"),
-	}
+func (r *RequestValidator) NewManageCategory(c *gin.Context) (*ManageCategory, error) {
+
 	request := ManageCategory{}
-	errors := r.Validator.Validate(request, inputParams)
-	if errors != nil {
-		return nil, errors
+
+	userID, userIDErr := changeToUint(c.Param("UserID"), "UserID")
+
+	if userIDErr != nil {
+		return nil, userIDErr
+	} else {
+		request.UserID = userID
 	}
 
-	request.UserID = changeToUint(c.Param("UserID"))
-	request.JokeID = changeToUint(c.PostForm("JokeID"))
-	request.CategoryID = changeToUint(c.Param("ID"))
+	jokeID, jokeIDErr := changeToUint(c.PostForm("JokeID"), "JokeID")
+	if jokeIDErr != nil {
+		return nil, jokeIDErr
+	} else {
+		request.JokeID = jokeID
+	}
+
+	categoryID, categoryIDErr := changeToUint(c.Param("ID"), "CategoryID")
+
+	if categoryIDErr != nil {
+		return nil, categoryIDErr
+	} else {
+		request.CategoryID = categoryID
+	}
+
+	requestError := r.Validator.Struct(request)
+
+	if requestError != nil {
+		return nil, requestError
+	}
 
 	return &request, nil
 }

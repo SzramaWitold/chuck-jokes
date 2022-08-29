@@ -6,24 +6,33 @@ import (
 
 type GetCategory struct {
 	UserID     uint
-	CategoryID uint `validation:"Required,Uint"`
+	CategoryID uint `validate:"required"`
 }
 
-func (r *RequestValidator) NewGetCategory(c *gin.Context) (*GetCategory, []error) {
-	inputParams := map[string]string{
-		"UserID":     c.Param("UserID"),
-		"CategoryID": c.Param("ID"),
-	}
-
+func (r *RequestValidator) NewGetCategory(c *gin.Context) (*GetCategory, error) {
 	var request GetCategory
-	errors := r.Validator.Validate(request, inputParams)
 
-	if errors != nil {
-		return nil, errors
+	userID, userIDErr := changeToUint(c.Param("UserID"), "UserID")
+
+	if userIDErr != nil {
+		return nil, userIDErr
+	} else {
+		request.UserID = userID
 	}
 
-	request.UserID = changeToUint(c.Param("UserID"))
-	request.CategoryID = changeToUint(c.Param("ID"))
+	categoryID, categoryIDErr := changeToUint(c.Param("ID"), "CategoryID")
+
+	if categoryIDErr != nil {
+		return nil, categoryIDErr
+	} else {
+		request.CategoryID = categoryID
+	}
+
+	requestError := r.Validator.Struct(request)
+
+	if requestError != nil {
+		return nil, requestError
+	}
 
 	return &request, nil
 }

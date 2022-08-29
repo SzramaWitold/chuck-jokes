@@ -5,25 +5,33 @@ import (
 )
 
 type AddFavourite struct {
-	UserID uint `validation:"Required,Uint"`
-	JokeID uint `validation:"Required,Uint"`
+	UserID uint `validate:"required"`
+	JokeID uint `validate:"required"`
 }
 
-func (r *RequestValidator) NewAddFavouriteRequest(c *gin.Context) (*AddFavourite, []error) {
-	inputParams := map[string]string{
-		"UserID": c.Param("UserID"),
-		"JokeID": c.PostForm("JokeID"),
-	}
-
+func (r *RequestValidator) NewAddFavouriteRequest(c *gin.Context) (*AddFavourite, error) {
 	var request AddFavourite
-	errors := r.Validator.Validate(request, inputParams)
 
-	if errors != nil {
-		return nil, errors
+	userID, userIDErr := changeToUint(c.Param("UserID"), "UserID")
+
+	if userIDErr != nil {
+		return nil, userIDErr
+	} else {
+		request.UserID = userID
 	}
 
-	request.UserID = changeToUint(c.Param("UserID"))
-	request.JokeID = changeToUint(c.PostForm("JokeID"))
+	jokeID, jokeIDErr := changeToUint(c.PostForm("JokeID"), "JokeID")
+	if jokeIDErr != nil {
+		return nil, jokeIDErr
+	} else {
+		request.JokeID = jokeID
+	}
+
+	reqError := r.Validator.Struct(request)
+
+	if reqError != nil {
+		return nil, reqError
+	}
 
 	return &request, nil
 }

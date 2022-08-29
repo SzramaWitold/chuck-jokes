@@ -1,30 +1,28 @@
 package requests
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 type Register struct {
-	Name     string `validation:"Required"`
-	Username string `validation:"Required,Unique:users"`
-	Password string `validation:"Required"`
+	Name     string `validate:"required"`
+	Username string `validate:"required"`
+	Password string `validate:"required"`
 }
 
-func (r *RequestValidator) NewRegister(c *gin.Context) (*Register, []error) {
-	inputParams := map[string]string{
-		"Name":     c.PostForm("Name"),
-		"Username": c.PostForm("Username"),
-		"Password": c.PostForm("Password"),
-	}
-
+func (r *RequestValidator) NewRegister(c *gin.Context) (*Register, error) {
 	var request Register
-	errors := r.Validator.Validate(request, inputParams)
-
-	if errors != nil {
-		return nil, errors
-	}
 
 	request.Name = c.PostForm("Name")
 	request.Username = c.PostForm("Username")
 	request.Password = c.PostForm("Password")
+
+	requestError := r.Validator.Struct(request)
+	if requestError != nil {
+		return nil, requestError
+	} else {
+
+	}
 
 	return &request, nil
 }

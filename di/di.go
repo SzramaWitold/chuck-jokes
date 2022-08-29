@@ -2,8 +2,8 @@ package di
 
 import (
 	"chuck-jokes/pkg/token"
-	"chuck-jokes/pkg/validator"
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	"log"
 	"os"
 	"strconv"
@@ -22,14 +22,14 @@ type container struct {
 	gorm      *gorm.DB
 	scheduler *gocron.Scheduler
 	jwt       token.IHandler
-	validator validator.IValidator
+	validator *validator.Validate
 }
 
 var cont = &container{}
 
-func VALIDATOR(db *gorm.DB) validator.IValidator {
+func VALIDATOR() *validator.Validate {
 	if cont.validator == nil {
-		cont.validator = validator.NewValidator(db)
+		cont.validator = validator.New()
 	}
 
 	return cont.validator

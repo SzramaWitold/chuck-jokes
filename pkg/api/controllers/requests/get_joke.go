@@ -5,22 +5,25 @@ import (
 )
 
 type Joke struct {
-	JokeID uint `validation:"Required,Uint"`
+	JokeID uint `validate:"required"`
 }
 
-func (r *RequestValidator) NewJoke(c *gin.Context) (*Joke, []error) {
-	inputParams := map[string]string{
-		"JokeID": c.Param("ID"),
-	}
-
+func (r *RequestValidator) NewJoke(c *gin.Context) (*Joke, error) {
 	var request Joke
-	errors := r.Validator.Validate(request, inputParams)
 
-	if errors != nil {
-		return nil, errors
+	jokeID, jokeIDErr := changeToUint(c.Param("ID"), "JokeID")
+
+	if jokeIDErr != nil {
+		return nil, jokeIDErr
 	}
 
-	request.JokeID = changeToUint(c.Param("ID"))
+	request.JokeID = jokeID
+
+	requestError := r.Validator.Struct(request)
+
+	if requestError != nil {
+		return nil, requestError
+	}
 
 	return &request, nil
 }

@@ -19,7 +19,7 @@ var rootCmd = &cobra.Command{
 	Run: func(_ *cobra.Command, _ []string) {
 		gorm := di.GORM()
 		jwt := di.JWT()
-		request := requests.NewRequestValidator(di.VALIDATOR(gorm))
+		request := requests.NewRequestValidator(di.VALIDATOR())
 		response := responses.NewResponse()
 		repository := repositories.NewRepository(gorm)
 		controller := controllers.NewController(jwt, request, response, repository)

@@ -14,13 +14,13 @@ import (
 // @Param        Name    formData     string  true  "Name"
 // @Param Authorization header string true "With the bearer started"
 // @Success      200  {object} responses.Category
-// @Failure      400  {array}  responses.Error
+// @Failure      400  {object}  responses.Error
 // @Router       /categories [post]
 func (cont *Controller) CreateCategory() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		request, requestErr := cont.Request.NewCreateCategory(c)
 		if requestErr != nil {
-			c.JSON(http.StatusBadRequest, cont.Response.NewErrorsCollection(requestErr))
+			c.JSON(http.StatusBadRequest, cont.Response.NewError(requestErr))
 			return
 		}
 
@@ -39,13 +39,12 @@ func (cont *Controller) CreateCategory() func(c *gin.Context) {
 // @Param Authorization header string true "With the bearer started"
 // @Success      200  {object} responses.Success
 // @Failure      400  {object}  responses.Error
-// @Failure      400  {array}  responses.Error
 // @Router       /categories/{ID} [put]
 func (cont *Controller) AddToCategory() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		request, requestErr := cont.Request.NewManageCategory(c)
 		if requestErr != nil {
-			c.JSON(http.StatusBadRequest, cont.Response.NewErrorsCollection(requestErr))
+			c.JSON(http.StatusBadRequest, cont.Response.NewError(requestErr))
 			return
 		}
 
@@ -70,13 +69,12 @@ func (cont *Controller) AddToCategory() func(c *gin.Context) {
 // @Param Authorization header string true "With the bearer started"
 // @Success      200  {object} responses.Success
 // @Failure      400  {object}  responses.Error
-// @Failure      400  {array}  responses.Error
 // @Router       /categories/{ID} [delete]
 func (cont *Controller) RemoveFromCategory() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		request, requestErr := cont.Request.NewManageCategory(c)
 		if requestErr != nil {
-			c.JSON(http.StatusBadRequest, cont.Response.NewErrorsCollection(requestErr))
+			c.JSON(http.StatusBadRequest, cont.Response.NewError(requestErr))
 			return
 		}
 		addError := cont.Repository.Category.AddToCategory(request.UserID, request.CategoryID, request.JokeID)
@@ -99,14 +97,13 @@ func (cont *Controller) RemoveFromCategory() func(c *gin.Context) {
 // @Param Authorization header string true "With the bearer started"
 // @Success      200  {object} responses.Success
 // @Failure      400  {object}  responses.Error
-// @Failure      400  {array}  responses.Error
 // @Router       /categories/{ID}/access [put]
 func (cont *Controller) SetAccessCategory() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		request, requestErr := cont.Request.NewSetAccess(c)
 
 		if requestErr != nil {
-			c.JSON(http.StatusBadRequest, cont.Response.NewErrorsCollection(requestErr))
+			c.JSON(http.StatusBadRequest, cont.Response.NewError(requestErr))
 			return
 		}
 
@@ -131,14 +128,13 @@ func (cont *Controller) SetAccessCategory() func(c *gin.Context) {
 // @Param Authorization header string false "With the bearer started"
 // @Success      200  {object} responses.Category
 // @Failure      400  {object}  responses.Error
-// @Failure      400  {array}  responses.Error
 // @Router       /categories/{ID} [get]
 func (cont *Controller) GetCategory() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		request, requestErr := cont.Request.NewGetCategory(c)
 
 		if requestErr != nil {
-			c.JSON(http.StatusBadRequest, cont.Response.NewErrorsCollection(requestErr))
+			c.JSON(http.StatusBadRequest, cont.Response.NewError(requestErr))
 			return
 		}
 

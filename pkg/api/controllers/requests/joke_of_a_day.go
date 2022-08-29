@@ -5,22 +5,19 @@ import (
 )
 
 type JokeOfADay struct {
-	Date string `validation:"Date"`
+	Date string `validate:"datetime"`
 }
 
-func (r *RequestValidator) NewJokeOfADay(c *gin.Context) (*JokeOfADay, []error) {
-	inputParams := map[string]string{
-		"Date": c.Query("date"),
-	}
-
+func (r *RequestValidator) NewJokeOfADay(c *gin.Context) (*JokeOfADay, error) {
 	var request JokeOfADay
-	errors := r.Validator.Validate(request, inputParams)
-
-	if errors != nil {
-		return nil, errors
-	}
 
 	request.Date = c.Query("date")
+
+	requestError := r.Validator.Struct(request)
+
+	if requestError != nil {
+		return nil, requestError
+	}
 
 	return &request, nil
 }

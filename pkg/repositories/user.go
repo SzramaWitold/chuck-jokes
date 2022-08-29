@@ -35,6 +35,17 @@ func (u *User) Register(name, username, password string) error {
 		Password: hashPassword,
 	}
 
+	var result struct {
+		Found bool
+	}
+
+	query := fmt.Sprintf("SELECT EXISTS(SELECT * FROM %v WHERE %v = ?) AS found", "users", "username")
+	u.db.Raw(query, username).Scan(&result)
+
+	if result.Found == true {
+		return fmt.Errorf("username already taken")
+	}
+
 	tx := u.db.Create(&user)
 
 	if tx.Error != nil {

@@ -6,18 +6,25 @@ import (
 
 type Favourites struct {
 	PaginationRequest
-	UserID uint `validation:"Required,Uint"`
+	UserID uint `validate:"required"`
 }
 
 func (r *RequestValidator) NewFavourites(c *gin.Context) (*Favourites, error) {
-	userID, userIDErr := validateTokenUser(c)
+	var request Favourites
+
+	userID, userIDErr := changeToUint(c.Param("UserID"), "UserID")
 
 	if userIDErr != nil {
 		return nil, userIDErr
 	}
 
-	return &Favourites{
-		PaginationRequest: r.NewPagination(c),
-		UserID:            userID,
-	}, nil
+	request.UserID = userID
+
+	requestError := r.Validator.Struct(request)
+
+	if requestError != nil {
+		return nil, requestError
+	}
+
+	return &request, nil
 }

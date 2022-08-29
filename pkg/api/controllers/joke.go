@@ -32,14 +32,14 @@ func (cont *Controller) GetJokes() func(c *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Success      200  {object} responses.Joke
-// @Failure      401  {array}  responses.Error
+// @Failure      401  {object}  responses.Error
 // @Router       /jokes/{ID} [get]
 func (cont *Controller) GetJoke() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		request, requestErr := cont.Request.NewJoke(c)
 
 		if requestErr != nil {
-			c.JSON(http.StatusBadRequest, cont.Response.NewErrorsCollection(requestErr))
+			c.JSON(http.StatusBadRequest, cont.Response.NewError(requestErr))
 			return
 		}
 
@@ -57,14 +57,14 @@ func (cont *Controller) GetJoke() func(c *gin.Context) {
 // @Produce      json
 // @Param Authorization header string true "With the bearer started"
 // @Success      200  {object} responses.JokeStatistic
-// @Failure      401  {array}  responses.Error
+// @Failure      401  {object}  responses.Error
 // @Router       /jokes/{ID}/statistic [get]
 func (cont *Controller) GetStatistic() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		request, requestErr := cont.Request.NewJoke(c)
 
 		if requestErr != nil {
-			c.JSON(http.StatusBadRequest, cont.Response.NewErrorsCollection(requestErr))
+			c.JSON(http.StatusBadRequest, cont.Response.NewError(requestErr))
 			return
 		}
 
@@ -81,14 +81,14 @@ func (cont *Controller) GetStatistic() func(c *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Success      200  {object} responses.Joke
-// @Failure      401  {array}  responses.Error
+// @Failure      401  {object}  responses.Error
 // @Router       /jokeoftheday [get]
 func (cont *Controller) GetJokeOfADay() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		request, requestErr := cont.Request.NewJokeOfADay(c)
 
 		if requestErr != nil {
-			c.JSON(http.StatusBadRequest, cont.Response.NewErrorsCollection(requestErr))
+			c.JSON(http.StatusBadRequest, cont.Response.NewError(requestErr))
 			return
 		}
 

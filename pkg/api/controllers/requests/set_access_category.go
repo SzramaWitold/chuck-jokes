@@ -5,25 +5,34 @@ import (
 )
 
 type SetAccess struct {
-	CategoryID uint `validation:"Required,Uint"`
-	UserID     uint `validation:"Required,Uint"`
+	CategoryID uint `validate:"required"`
+	UserID     uint `validate:"required"`
 }
 
-func (r *RequestValidator) NewSetAccess(c *gin.Context) (*SetAccess, []error) {
-	inputParams := map[string]string{
-		"CategoryID": c.Param("ID"),
-		"UserID":     c.Param("UserID"),
-	}
-
+func (r *RequestValidator) NewSetAccess(c *gin.Context) (*SetAccess, error) {
 	var request SetAccess
-	errors := r.Validator.Validate(request, inputParams)
 
-	if errors != nil {
-		return nil, errors
+	categoryID, categoryIDErr := changeToUint(c.Param("ID"), "CategoryID")
+
+	if categoryIDErr != nil {
+		return nil, categoryIDErr
+	} else {
+		request.CategoryID = categoryID
 	}
 
-	request.CategoryID = changeToUint(c.Param("ID"))
-	request.UserID = changeToUint(c.Param("UserID"))
+	userID, userIDErr := changeToUint(c.Param("UserID"), "UserID")
+
+	if userIDErr != nil {
+		return nil, userIDErr
+	} else {
+		request.UserID = userID
+	}
+
+	requestError := r.Validator.Struct(request)
+
+	if requestError != nil {
+		return nil, requestError
+	}
 
 	return &request, nil
 }

@@ -3,7 +3,6 @@ package controllers
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -49,7 +48,7 @@ func (cont *Controller) Login() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		request, requestErr := cont.Request.NewLogin(c)
 		if requestErr != nil {
-			c.JSON(http.StatusBadRequest, cont.Response.NewErrorsCollection(requestErr))
+			c.JSON(http.StatusBadRequest, cont.Response.NewError(requestErr))
 			return
 		}
 
@@ -80,18 +79,14 @@ func (cont *Controller) Register() func(c *gin.Context) {
 		request, requestErr := cont.Request.NewRegister(c)
 
 		if requestErr != nil {
-			c.JSON(http.StatusBadRequest, cont.Response.NewErrorsCollection(requestErr))
+			c.JSON(http.StatusBadRequest, cont.Response.NewError(requestErr))
 			return
 		}
 
 		createUserError := cont.Repository.User.Register(request.Name, request.Username, request.Password)
 
 		if createUserError != nil {
-			log.Println(createUserError)
-			errors := []error{
-				fmt.Errorf("something went wrong pleas try again later"),
-			}
-			c.JSON(http.StatusBadRequest, cont.Response.NewErrorsCollection(errors))
+			c.JSON(http.StatusBadRequest, cont.Response.NewError(createUserError))
 			return
 		}
 
@@ -137,7 +132,7 @@ func (cont *Controller) AddFavourite() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		request, requestErr := cont.Request.NewAddFavouriteRequest(c)
 		if requestErr != nil {
-			c.JSON(http.StatusBadRequest, cont.Response.NewErrorsCollection(requestErr))
+			c.JSON(http.StatusBadRequest, cont.Response.NewError(requestErr))
 			return
 		} else {
 			repErr := cont.Repository.User.AddFavourite(request.UserID, request.JokeID)
