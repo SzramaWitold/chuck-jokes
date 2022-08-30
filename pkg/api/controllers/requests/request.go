@@ -2,9 +2,10 @@ package requests
 
 import (
 	"fmt"
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"strconv"
 )
 
 type RequestHandler interface {
@@ -12,7 +13,7 @@ type RequestHandler interface {
 	NewLogin(c *gin.Context) (*LoginRequest, error)
 	NewAddFavouriteRequest(c *gin.Context) (*AddFavourite, error)
 	NewFavourites(c *gin.Context) (*Favourites, error)
-	NewPagination(c *gin.Context) PaginationRequest
+	NewFindCollection(c *gin.Context) FindCollection
 	NewManageCategory(c *gin.Context) (*ManageCategory, error)
 	NewJokeOfADay(c *gin.Context) (*JokeOfADay, error)
 	NewRegister(c *gin.Context) (*Register, error)

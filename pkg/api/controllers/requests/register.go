@@ -18,10 +18,9 @@ func (r *RequestValidator) NewRegister(c *gin.Context) (*Register, error) {
 	request.Password = c.PostForm("Password")
 
 	requestError := r.Validator.Struct(request)
+
 	if requestError != nil {
 		return nil, requestError
-	} else {
-
 	}
 
 	return &request, nil

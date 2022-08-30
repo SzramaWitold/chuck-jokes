@@ -14,7 +14,7 @@ type CategoryJokes struct {
 	Jokes     []Joke
 }
 
-func (r *Response) NewCategoryJokes(category *models.Category) CategoryJokes {
+func (r *DefaultResponseHandler) NewCategoryJokes(category *models.Category) CategoryJokes {
 	log.Println(category)
 	return CategoryJokes{
 		ID:        category.ID,

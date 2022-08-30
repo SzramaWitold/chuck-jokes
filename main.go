@@ -2,7 +2,6 @@ package main
 
 import (
 	"chuck-jokes/cmd"
-
 	"github.com/joho/godotenv"
 )
 
@@ -13,9 +12,9 @@ import (
 // @host      localhost:8080
 // @BasePath  /
 func main() {
-	err := godotenv.Load()
-	if err != nil {
+	if err := godotenv.Load(); err != nil {
 		panic(err)
 	}
+
 	cmd.Execute()
 }

@@ -13,7 +13,7 @@ type Joke struct {
 	Value     string
 }
 
-func (r *Response) NewJoke(joke *models.Joke) Joke {
+func (r *DefaultResponseHandler) NewJoke(joke *models.Joke) Joke {
 	return Joke{
 		ID:        joke.ID,
 		CreatedAt: joke.CreatedAt,
@@ -31,7 +31,7 @@ type PaginateJokes struct {
 	Rows       []Joke
 }
 
-func (r *Response) NewJokeCollection(jokes []models.Joke) []Joke {
+func (r *DefaultResponseHandler) NewJokeCollection(jokes []models.Joke) []Joke {
 	var jokesCollection []Joke
 
 	for _, joke := range jokes {
@@ -41,7 +41,7 @@ func (r *Response) NewJokeCollection(jokes []models.Joke) []Joke {
 	return jokesCollection
 }
 
-func (r *Response) NewPaginateJokes(
+func (r *DefaultResponseHandler) NewPaginateJokes(
 	repJokes *repositories.Pagination[models.Joke]) *Pagination[Joke] {
 	return ResponsePagination[Joke](
 		repJokes.Page,

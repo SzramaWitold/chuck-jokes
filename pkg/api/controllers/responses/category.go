@@ -12,7 +12,7 @@ type Category struct {
 	UserID    uint
 }
 
-func (r *Response) NewCategory(category *models.Category) Category {
+func (r *DefaultResponseHandler) NewCategory(category *models.Category) Category {
 	return Category{
 		ID:        category.ID,
 		CreatedAt: &category.CreatedAt,

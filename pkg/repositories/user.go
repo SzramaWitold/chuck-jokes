@@ -1,9 +1,12 @@
 package repositories
 
 import (
+	"fmt"
+	"log"
+
 	"chuck-jokes/models"
 	gormModels "chuck-jokes/pkg/database/gorm/models"
-	"fmt"
+
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -11,7 +14,7 @@ import (
 type UserRepository interface {
 	Register(name string, username string, password string) error
 	Authenticate(username string, password string) *models.User
-	GetUserFromToken(id int) *models.User
+	FindById(id int) *models.User
 	AddFavourite(userID uint, jokeID uint) error
 }
 
@@ -26,29 +29,18 @@ func NewUser(db *gorm.DB) *User {
 
 func (u *User) Register(name, username, password string) error {
 	hashPassword, hashPasswordErr := hashPassword(password)
+
 	if hashPasswordErr != nil {
 		return hashPasswordErr
 	}
-	var user = gormModels.User{
+
+	user := gormModels.User{
 		Username: username,
 		Name:     name,
 		Password: hashPassword,
 	}
 
-	var result struct {
-		Found bool
-	}
-
-	query := fmt.Sprintf("SELECT EXISTS(SELECT * FROM %v WHERE %v = ?) AS found", "users", "username")
-	u.db.Raw(query, username).Scan(&result)
-
-	if result.Found == true {
-		return fmt.Errorf("username already taken")
-	}
-
-	tx := u.db.Create(&user)
-
-	if tx.Error != nil {
+	if tx := u.db.Create(&user); tx.Error != nil {
 		return tx.Error
 	}
 
@@ -57,10 +49,11 @@ func (u *User) Register(name, username, password string) error {
 
 // Authenticate get user based on username and password
 func (u *User) Authenticate(username, password string) *models.User {
-	var user = models.User{}
-	u.db.Where("username = ?", username).First(&user)
+	user := models.User{}
 
-	if user.ID == 0 {
+	if tx := u.db.Where("username = ?", username).First(&user); tx.Error != nil {
+		log.Println(tx.Error)
+
 		return nil
 	}
 
@@ -71,11 +64,12 @@ func (u *User) Authenticate(username, password string) *models.User {
 	return &user
 }
 
-func (u *User) GetUserFromToken(id int) *models.User {
-	var user = models.User{}
-	u.db.Where("ID = ?", id).First(&user)
+func (u *User) FindById(id int) *models.User {
+	user := models.User{}
 
-	if user.ID == 0 {
+	if tx := u.db.Where("ID = ?", id).First(&user); tx.Error != nil {
+		log.Println(tx.Error)
+
 		return nil
 	}
 
@@ -83,22 +77,22 @@ func (u *User) GetUserFromToken(id int) *models.User {
 }
 
 func (u *User) AddFavourite(userID, jokeID uint) error {
-	var joke = models.Joke{}
-	var user = models.User{}
-	u.db.First(&user, userID)
-	u.db.First(&joke, jokeID)
+	joke := models.Joke{}
+	user := models.User{}
 
-	if user.ID == 0 {
-		return fmt.Errorf("user with provided id: %v not exist", userID)
+	if userTx := u.db.First(&user, userID); userTx.Error != nil {
+		log.Println(userTx.Error)
+
+		return userTx.Error
 	}
 
-	if joke.ID == 0 {
+	if jokeTx := u.db.First(&joke, jokeID); jokeTx.Error != nil {
+		log.Println(jokeTx.Error)
+
 		return fmt.Errorf("joke with provided id: %v not exist", jokeID)
 	}
 
-	updateError := u.db.Model(&user).Association("Favourites").Append(&joke)
-
-	if updateError != nil {
+	if updateError := u.db.Model(&user).Association("Favourites").Append(&joke); updateError != nil {
 		return updateError
 	}
 
@@ -113,5 +107,6 @@ func hashPassword(password string) (string, error) {
 
 func checkPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+
 	return err == nil
 }

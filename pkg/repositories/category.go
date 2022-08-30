@@ -1,18 +1,20 @@
 package repositories
 
 import (
-	"chuck-jokes/models"
 	"fmt"
-	"gorm.io/gorm"
 	"log"
 	"time"
+
+	"chuck-jokes/models"
+
+	"gorm.io/gorm"
 )
 
 type CategoryRepository interface {
-	CreateCategory(userID uint, name string) *models.Category
+	Create(userID uint, name string) *models.Category
 	AddToCategory(userId uint, categoryID uint, jokeID uint) error
 	UpdateAccess(userId uint, categoryID uint) error
-	GetCategory(userId uint, categoryID uint) (*models.Category, error)
+	FindByUserIDAndCategoryID(userId uint, categoryID uint) (*models.Category, error)
 }
 
 type Category struct {
@@ -23,20 +25,15 @@ func NewCategory(db *gorm.DB) *Category {
 	return &Category{db: db}
 }
 
-func (c *Category) CreateCategory(userID uint, name string) *models.Category {
-	var category = models.Category{
+func (c *Category) Create(userID uint, name string) *models.Category {
+	category := models.Category{
 		UserID: userID,
 		Name:   name,
 	}
 
-	if err := c.db.Model(&category).Where("user_id = ? AND name = ?", userID, name).First(&category).Error; err == nil {
-		log.Println("category already exist for user:", userID)
-	} else {
-		c.db.Create(&category)
-	}
+	if tx := c.db.Create(&category); tx.Error != nil {
+		log.Println(tx.Error)
 
-	if category.ID == 0 {
-		log.Printf("Problem with adding new category with userID: %v and name: %v \n", userID, name)
 		return nil
 	}
 
@@ -44,20 +41,19 @@ func (c *Category) CreateCategory(userID uint, name string) *models.Category {
 }
 
 func (c *Category) AddToCategory(userId, categoryID, jokeID uint) error {
-	var category, categoryError = getUserCategory(userId, categoryID, c.db)
+	category, categoryError := getUserCategory(userId, categoryID, c.db)
 
 	if categoryError != nil {
 		return categoryError
 	}
 
-	var joke = models.Joke{}
-	c.db.First(&joke, jokeID)
+	joke := models.Joke{}
 
-	if joke.ID == 0 {
-		return fmt.Errorf("joke with provided id: %v not exist", jokeID)
+	if tx := c.db.First(&joke, jokeID); tx.Error != nil {
+		return tx.Error
 	}
 
-	updateError := c.db.Model(&category).Association("Jokes").Delete(&joke)
+	updateError := c.db.Model(&category).Association("Jokes").Append(&joke)
 
 	if updateError != nil {
 		return updateError
@@ -67,7 +63,7 @@ func (c *Category) AddToCategory(userId, categoryID, jokeID uint) error {
 }
 
 func (c *Category) UpdateAccess(userId, categoryID uint) error {
-	var category, categoryError = getUserCategory(userId, categoryID, c.db)
+	category, categoryError := getUserCategory(userId, categoryID, c.db)
 
 	if categoryError != nil {
 		return categoryError
@@ -76,39 +72,41 @@ func (c *Category) UpdateAccess(userId, categoryID uint) error {
 	access := time.Now().Add(2 * time.Hour)
 	category.Access = &access
 
-	tx := c.db.Save(category)
-
-	if tx.Error != nil {
+	if tx := c.db.Save(category); tx.Error != nil {
 		return tx.Error
 	}
 
 	return nil
 }
 
-func (c *Category) GetCategory(userId, categoryID uint) (*models.Category, error) {
-	var category = models.Category{}
-	c.db.Preload("Jokes").First(&category, categoryID)
-	if category.ID == 0 {
-		return nil, fmt.Errorf("can not find category with provided ID: %v", categoryID)
+func (c *Category) FindByUserIDAndCategoryID(userId, categoryID uint) (*models.Category, error) {
+	category := models.Category{}
+
+	if tx := c.db.Preload("Jokes").First(&category, categoryID); tx.Error != nil {
+		return nil, tx.Error
 	}
 
 	if time.Now().Before(*category.Access) {
 		return &category, nil
-	} else if userId != 0 {
-		return &category, nil
-	} else {
-		return nil, fmt.Errorf("do not have permission to get this category")
 	}
+
+	if userId != 0 {
+		return &category, nil
+	}
+
+	return nil, fmt.Errorf("do not have permission to get this category")
 }
 
 func getUserCategory(userId, categoryID uint, db *gorm.DB) (*models.Category, error) {
-	var category = models.Category{}
-	db.First(&category, categoryID)
-	if category.ID == 0 {
-		return nil, fmt.Errorf("can not find category with provided ID: %v", categoryID)
+	category := models.Category{}
+
+	if tx := db.First(&category, categoryID); tx.Error != nil {
+		return nil, tx.Error
 	}
+
 	if category.UserID != userId {
 		return nil, fmt.Errorf("do not have permission to add joke to this category")
 	}
+
 	return &category, nil
 }

@@ -1,23 +1,19 @@
 package di
 
 import (
-	"chuck-jokes/pkg/token"
-	"fmt"
-	"github.com/go-playground/validator/v10"
-	"log"
 	"os"
-	"strconv"
 	"time"
 
-	"github.com/go-co-op/gocron"
+	"chuck-jokes/pkg/token"
 
-	// required for myslq connection
+	"github.com/go-co-op/gocron"
+	"github.com/go-playground/validator/v10"
+	// required for myslq connection.
 	_ "github.com/go-sql-driver/mysql"
-	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
-// container for dependencies
+// container for dependencies.
 type container struct {
 	gorm      *gorm.DB
 	scheduler *gocron.Scheduler
@@ -27,7 +23,7 @@ type container struct {
 
 var cont = &container{}
 
-func VALIDATOR() *validator.Validate {
+func Validator() *validator.Validate {
 	if cont.validator == nil {
 		cont.validator = validator.New()
 	}
@@ -46,10 +42,9 @@ func JWT() *token.TokenHandler {
 	return &cont.jwt
 }
 
-// GORM get gorm db connection
+// GORM get gorm db connection.
 func GORM() *gorm.DB {
 	if cont.gorm == nil {
-
 		cont.gorm = openConnection(
 			os.Getenv("DB_USER"),
 			os.Getenv("DB_PASSWORD"),
@@ -61,54 +56,11 @@ func GORM() *gorm.DB {
 	return cont.gorm
 }
 
-// Scheduler go crone scheduler connection
+// Scheduler go crone scheduler connection.
 func Scheduler() *gocron.Scheduler {
 	if cont.scheduler == nil {
 		cont.scheduler = gocron.NewScheduler(time.UTC)
 	}
 
 	return cont.scheduler
-}
-
-//OpenConnection for database inside DB var
-func openConnection(user, password, host, port, name string) *gorm.DB {
-	if cont.gorm == nil {
-		database, err := gorm.Open(mysql.New(mysql.Config{
-			DSN: getDSN(user, password, host, port, name),
-		}))
-
-		if err != nil {
-			panic(err)
-		}
-		cont.gorm = database
-		log.Println("Database connected")
-	}
-
-	return cont.gorm
-}
-
-// getDSN base on .env file
-func getDSN(user, password, host, port, name string) string {
-	return fmt.Sprintf(
-		"%v:%v@tcp(%v:%v)/%v?charset=utf8mb4&parseTime=True&loc=Local",
-		user,
-		password,
-		host,
-		port,
-		name,
-	)
-}
-
-func mustGetIntegerEnvironmentValue(val string, def int) int {
-	if val != "" {
-		intVal, ttlErr := strconv.Atoi(val)
-		if ttlErr != nil {
-			log.Println(ttlErr)
-			return def
-		}
-
-		return intVal
-	} else {
-		return def
-	}
 }

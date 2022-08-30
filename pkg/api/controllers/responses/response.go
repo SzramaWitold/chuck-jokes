@@ -19,10 +19,10 @@ type ResponseHandler interface {
 	NewCategoryJokes(category *models.Category) CategoryJokes
 	NewJokeStatistic(joke *models.Joke, favAmount uint) JokeStatistic
 }
-type Response struct{}
+type DefaultResponseHandler struct{}
 
-func NewResponse() *Response {
-	return &Response{}
+func NewDefaultResponseHandler() *DefaultResponseHandler {
+	return &DefaultResponseHandler{}
 }
 
 type Pagination[T interface{}] struct {

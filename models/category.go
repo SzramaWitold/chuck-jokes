@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-// Category base model
+// Category base model.
 type Category struct {
 	ID        uint
 	CreatedAt time.Time

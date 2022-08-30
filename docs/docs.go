@@ -28,7 +28,7 @@ const docTemplate = `{
                 "tags": [
                     "Category"
                 ],
-                "summary": "CreateCategory",
+                "summary": "Create",
                 "parameters": [
                     {
                         "type": "string",
@@ -53,7 +53,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Bad request",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -76,7 +76,7 @@ const docTemplate = `{
                 "tags": [
                     "Category"
                 ],
-                "summary": "GetCategory",
+                "summary": "FindByUserIDAndCategoryID",
                 "parameters": [
                     {
                         "type": "string",
@@ -100,7 +100,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Bad request",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -146,7 +146,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Bad request",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -192,7 +192,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Bad request",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -233,7 +233,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Bad request",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -256,7 +256,7 @@ const docTemplate = `{
                 "tags": [
                     "User"
                 ],
-                "summary": "GetFavourites",
+                "summary": "FindFavourites",
                 "parameters": [
                     {
                         "type": "string",
@@ -317,7 +317,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Bad request",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -378,7 +378,7 @@ const docTemplate = `{
                 "tags": [
                     "Joke"
                 ],
-                "summary": "GetJokes",
+                "summary": "FindAll",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -407,7 +407,7 @@ const docTemplate = `{
                 "tags": [
                     "Joke"
                 ],
-                "summary": "GetJoke",
+                "summary": "Find",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -470,7 +470,7 @@ const docTemplate = `{
         },
         "/login": {
             "post": {
-                "description": "get JWT token",
+                "description": "get jwt token",
                 "consumes": [
                     "application/json"
                 ],
@@ -595,7 +595,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Bad request",
                         "schema": {
                             "type": "array",
                             "items": {

@@ -5,7 +5,7 @@ import (
 )
 
 type Favourites struct {
-	PaginationRequest
+	FindCollection
 	UserID uint `validate:"required"`
 }
 

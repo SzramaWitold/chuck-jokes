@@ -1,9 +1,9 @@
 package cmd
 
 import (
-	"chuck-jokes/pkg/database/gorm"
 	"os"
 
+	"chuck-jokes/pkg/database/gorm"
 	"github.com/spf13/cobra"
 )
 

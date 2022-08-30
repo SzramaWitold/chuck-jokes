@@ -13,7 +13,7 @@ type JokeStatistic struct {
 	Shows     uint
 }
 
-func (r *Response) NewJokeStatistic(joke *models.Joke, favAmount uint) JokeStatistic {
+func (r *DefaultResponseHandler) NewJokeStatistic(joke *models.Joke, favAmount uint) JokeStatistic {
 	return JokeStatistic{
 		ID:        joke.ID,
 		CreatedAt: joke.CreatedAt,

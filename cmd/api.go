@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"log"
+
 	"chuck-jokes/di"
 	"chuck-jokes/pkg/api"
 	"chuck-jokes/pkg/api/controllers"
@@ -8,8 +10,8 @@ import (
 	"chuck-jokes/pkg/api/controllers/responses"
 	"chuck-jokes/pkg/api/middlewares"
 	"chuck-jokes/pkg/repositories"
+
 	"github.com/spf13/cobra"
-	"log"
 )
 
 var rootCmd = &cobra.Command{
@@ -19,10 +21,10 @@ var rootCmd = &cobra.Command{
 	Run: func(_ *cobra.Command, _ []string) {
 		gorm := di.GORM()
 		jwt := di.JWT()
-		request := requests.NewRequestValidator(di.VALIDATOR())
-		response := responses.NewResponse()
+		request := requests.NewRequestValidator(di.Validator())
+		response := responses.NewDefaultResponseHandler()
 		repository := repositories.NewRepository(gorm)
-		controller := controllers.NewController(jwt, request, response, repository)
+		controller := controllers.NewControllerWrapper(jwt, request, response, repository)
 		middleware := middlewares.NewMiddleware(jwt)
 
 		server := api.StartEngine(controller, middleware)
@@ -34,7 +36,7 @@ var rootCmd = &cobra.Command{
 	},
 }
 
-// Execute default execution for cmd
+// Execute default execution for cmd.
 func Execute() {
 	if cmdError := rootCmd.Execute(); cmdError != nil {
 		log.Panic(cmdError)

@@ -4,13 +4,13 @@ type Error struct {
 	Message string
 }
 
-func (r *Response) NewError(err error) Error {
+func (r *DefaultResponseHandler) NewError(err error) Error {
 	return Error{
 		Message: err.Error(),
 	}
 }
 
-func (r *Response) NewErrorsCollection(errors []error) []Error {
+func (r *DefaultResponseHandler) NewErrorsCollection(errors []error) []Error {
 	var collection []Error
 
 	for _, err := range errors {

@@ -13,7 +13,7 @@ type User struct {
 	Username  string
 }
 
-func (r *Response) NewUser(user *models.User) User {
+func (r *DefaultResponseHandler) NewUser(user *models.User) User {
 	return User{
 		ID:        user.ID,
 		CreatedAt: &user.CreatedAt,

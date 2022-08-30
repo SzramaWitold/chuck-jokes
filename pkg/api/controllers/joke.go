@@ -1,13 +1,36 @@
 package controllers
 
 import (
-	"chuck-jokes/pkg/utilities"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"chuck-jokes/pkg/api/controllers/requests"
+	"chuck-jokes/pkg/api/controllers/responses"
+	"chuck-jokes/pkg/repositories"
+
+	"chuck-jokes/pkg/utilities"
+
+	"github.com/gin-gonic/gin"
 )
 
-// GetJokes godoc
+type JokeController interface {
+	GetAll() func(c *gin.Context)
+	GetJokeOfADay() func(c *gin.Context)
+	Get() func(c *gin.Context)
+	GetStatistic() func(c *gin.Context)
+}
+
+type Joke struct {
+	request    requests.RequestHandler
+	response   responses.ResponseHandler
+	repository *repositories.Repository
+}
+
+func NewJoke(request requests.RequestHandler, response responses.ResponseHandler, repository *repositories.Repository) *Joke {
+	return &Joke{request: request, response: response, repository: repository}
+}
+
+// GetAll godoc
 // @Summary      GetJokes
 // @Description  Get list of jokes
 // @Tags         Joke
@@ -16,16 +39,16 @@ import (
 // @Success      200  {object} responses.PaginateJokes
 // @Failure      401  {object}  responses.Error
 // @Router       /jokes [get]
-func (cont *Controller) GetJokes() func(c *gin.Context) {
+func (j *Joke) GetAll() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		pagRequest := cont.Request.NewPagination(c)
-		repJokes := cont.Repository.Joke.GetJokes(pagRequest.Page, pagRequest.PerPage)
+		pageRequest := j.request.NewFindCollection(c)
+		repJokes := j.repository.Joke.FindAll(pageRequest)
 
-		c.JSON(http.StatusOK, cont.Response.NewPaginateJokes(repJokes))
+		c.JSON(http.StatusOK, j.response.NewPaginateJokes(repJokes))
 	}
 }
 
-// GetJoke godoc
+// Get godoc
 // @Summary      GetJoke
 // @Description  get specify joke
 // @Tags         Joke
@@ -34,18 +57,19 @@ func (cont *Controller) GetJokes() func(c *gin.Context) {
 // @Success      200  {object} responses.Joke
 // @Failure      401  {object}  responses.Error
 // @Router       /jokes/{ID} [get]
-func (cont *Controller) GetJoke() func(c *gin.Context) {
+func (j *Joke) Get() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		request, requestErr := cont.Request.NewJoke(c)
+		request, requestErr := j.request.NewJoke(c)
 
 		if requestErr != nil {
-			c.JSON(http.StatusBadRequest, cont.Response.NewError(requestErr))
+			c.JSON(http.StatusBadRequest, j.response.NewError(requestErr))
+
 			return
 		}
 
-		repJoke := cont.Repository.Joke.GetJoke(request.JokeID)
+		repJoke := j.repository.Joke.Find(request.JokeID)
 
-		c.JSON(http.StatusOK, cont.Response.NewJoke(repJoke))
+		c.JSON(http.StatusOK, j.response.NewJoke(repJoke))
 	}
 }
 
@@ -59,18 +83,19 @@ func (cont *Controller) GetJoke() func(c *gin.Context) {
 // @Success      200  {object} responses.JokeStatistic
 // @Failure      401  {object}  responses.Error
 // @Router       /jokes/{ID}/statistic [get]
-func (cont *Controller) GetStatistic() func(c *gin.Context) {
+func (j *Joke) GetStatistic() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		request, requestErr := cont.Request.NewJoke(c)
+		request, requestErr := j.request.NewJoke(c)
 
 		if requestErr != nil {
-			c.JSON(http.StatusBadRequest, cont.Response.NewError(requestErr))
+			c.JSON(http.StatusBadRequest, j.response.NewError(requestErr))
+
 			return
 		}
 
-		repJoke, favNumber := cont.Repository.Joke.GetStatistic(request.JokeID)
+		repJoke, favNumber := j.repository.Joke.GetStatistic(request.JokeID)
 
-		c.JSON(http.StatusOK, cont.Response.NewJokeStatistic(repJoke, favNumber))
+		c.JSON(http.StatusOK, j.response.NewJokeStatistic(repJoke, favNumber))
 	}
 }
 
@@ -83,12 +108,13 @@ func (cont *Controller) GetStatistic() func(c *gin.Context) {
 // @Success      200  {object} responses.Joke
 // @Failure      401  {object}  responses.Error
 // @Router       /jokeoftheday [get]
-func (cont *Controller) GetJokeOfADay() func(c *gin.Context) {
+func (j *Joke) GetJokeOfADay() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		request, requestErr := cont.Request.NewJokeOfADay(c)
+		request, requestErr := j.request.NewJokeOfADay(c)
 
 		if requestErr != nil {
-			c.JSON(http.StatusBadRequest, cont.Response.NewError(requestErr))
+			c.JSON(http.StatusBadRequest, j.response.NewError(requestErr))
+
 			return
 		}
 
@@ -96,12 +122,14 @@ func (cont *Controller) GetJokeOfADay() func(c *gin.Context) {
 			request.Date = utilities.GetToday().String()
 		}
 
-		joke := cont.Repository.Joke.JokeOfTheDay(request.Date)
+		joke := j.repository.Joke.JokeOfTheDay(request.Date)
 
 		if joke == nil {
-			c.JSON(http.StatusNotFound, cont.Response.NewError(fmt.Errorf("can not find joke for date: %v", request.Date)))
+			c.JSON(http.StatusNotFound, j.response.NewError(fmt.Errorf("can not find joke for date: %v", request.Date)))
+
 			return
 		}
-		c.JSON(http.StatusOK, cont.Response.NewJoke(joke))
+
+		c.JSON(http.StatusOK, j.response.NewJoke(joke))
 	}
 }

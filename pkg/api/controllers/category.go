@@ -1,9 +1,31 @@
 package controllers
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"chuck-jokes/pkg/api/controllers/requests"
+	"chuck-jokes/pkg/api/controllers/responses"
+	"chuck-jokes/pkg/repositories"
+	"github.com/gin-gonic/gin"
 )
+
+type CategoryController interface {
+	CreateCategory() func(c *gin.Context)
+	AddToCategory() func(c *gin.Context)
+	SetAccessCategory() func(c *gin.Context)
+	RemoveFromCategory() func(c *gin.Context)
+	GetCategory() func(c *gin.Context)
+}
+
+type Category struct {
+	request    requests.RequestHandler
+	response   responses.ResponseHandler
+	repository *repositories.Repository
+}
+
+func NewCategory(request requests.RequestHandler, response responses.ResponseHandler, repository *repositories.Repository) CategoryController {
+	return &Category{request: request, response: response, repository: repository}
+}
 
 // CreateCategory godoc
 // @Summary      CreateCategory
@@ -16,16 +38,16 @@ import (
 // @Success      200  {object} responses.Category
 // @Failure      400  {object}  responses.Error
 // @Router       /categories [post]
-func (cont *Controller) CreateCategory() func(c *gin.Context) {
+func (cat *Category) CreateCategory() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		request, requestErr := cont.Request.NewCreateCategory(c)
+		request, requestErr := cat.request.NewCreateCategory(c)
 		if requestErr != nil {
-			c.JSON(http.StatusBadRequest, cont.Response.NewError(requestErr))
+			c.JSON(http.StatusBadRequest, cat.response.NewError(requestErr))
 			return
 		}
 
-		category := cont.Repository.Category.CreateCategory(request.UserID, request.Name)
-		c.JSON(http.StatusOK, cont.Response.NewCategory(category))
+		category := cat.repository.Category.Create(request.UserID, request.Name)
+		c.JSON(http.StatusOK, cat.response.NewCategory(category))
 	}
 }
 
@@ -40,22 +62,22 @@ func (cont *Controller) CreateCategory() func(c *gin.Context) {
 // @Success      200  {object} responses.Success
 // @Failure      400  {object}  responses.Error
 // @Router       /categories/{ID} [put]
-func (cont *Controller) AddToCategory() func(c *gin.Context) {
+func (cat *Category) AddToCategory() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		request, requestErr := cont.Request.NewManageCategory(c)
+		request, requestErr := cat.request.NewManageCategory(c)
 		if requestErr != nil {
-			c.JSON(http.StatusBadRequest, cont.Response.NewError(requestErr))
+			c.JSON(http.StatusBadRequest, cat.response.NewError(requestErr))
 			return
 		}
 
-		addError := cont.Repository.Category.AddToCategory(request.UserID, request.CategoryID, request.JokeID)
+		addError := cat.repository.Category.AddToCategory(request.UserID, request.CategoryID, request.JokeID)
 
 		if addError != nil {
-			c.JSON(http.StatusBadRequest, cont.Response.NewError(addError))
+			c.JSON(http.StatusBadRequest, cat.response.NewError(addError))
 			return
 		}
 
-		c.JSON(http.StatusOK, cont.Response.NewSuccess("success"))
+		c.JSON(http.StatusOK, cat.response.NewSuccess("success"))
 	}
 }
 
@@ -70,21 +92,21 @@ func (cont *Controller) AddToCategory() func(c *gin.Context) {
 // @Success      200  {object} responses.Success
 // @Failure      400  {object}  responses.Error
 // @Router       /categories/{ID} [delete]
-func (cont *Controller) RemoveFromCategory() func(c *gin.Context) {
+func (cat *Category) RemoveFromCategory() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		request, requestErr := cont.Request.NewManageCategory(c)
+		request, requestErr := cat.request.NewManageCategory(c)
 		if requestErr != nil {
-			c.JSON(http.StatusBadRequest, cont.Response.NewError(requestErr))
+			c.JSON(http.StatusBadRequest, cat.response.NewError(requestErr))
 			return
 		}
-		addError := cont.Repository.Category.AddToCategory(request.UserID, request.CategoryID, request.JokeID)
+		addError := cat.repository.Category.AddToCategory(request.UserID, request.CategoryID, request.JokeID)
 
 		if addError != nil {
-			c.JSON(http.StatusBadRequest, cont.Response.NewError(addError))
+			c.JSON(http.StatusBadRequest, cat.response.NewError(addError))
 			return
 		}
 
-		c.JSON(http.StatusOK, cont.Response.NewSuccess("success"))
+		c.JSON(http.StatusOK, cat.response.NewSuccess("success"))
 	}
 }
 
@@ -98,23 +120,23 @@ func (cont *Controller) RemoveFromCategory() func(c *gin.Context) {
 // @Success      200  {object} responses.Success
 // @Failure      400  {object}  responses.Error
 // @Router       /categories/{ID}/access [put]
-func (cont *Controller) SetAccessCategory() func(c *gin.Context) {
+func (cat *Category) SetAccessCategory() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		request, requestErr := cont.Request.NewSetAccess(c)
+		request, requestErr := cat.request.NewSetAccess(c)
 
 		if requestErr != nil {
-			c.JSON(http.StatusBadRequest, cont.Response.NewError(requestErr))
+			c.JSON(http.StatusBadRequest, cat.response.NewError(requestErr))
 			return
 		}
 
-		updateAccessErrors := cont.Repository.Category.UpdateAccess(request.UserID, request.CategoryID)
+		updateAccessErrors := cat.repository.Category.UpdateAccess(request.UserID, request.CategoryID)
 
 		if updateAccessErrors != nil {
-			c.JSON(http.StatusBadRequest, cont.Response.NewError(updateAccessErrors))
+			c.JSON(http.StatusBadRequest, cat.response.NewError(updateAccessErrors))
 			return
 		}
 
-		c.JSON(http.StatusOK, cont.Response.NewSuccess("success"))
+		c.JSON(http.StatusOK, cat.response.NewSuccess("success"))
 	}
 }
 
@@ -129,22 +151,22 @@ func (cont *Controller) SetAccessCategory() func(c *gin.Context) {
 // @Success      200  {object} responses.Category
 // @Failure      400  {object}  responses.Error
 // @Router       /categories/{ID} [get]
-func (cont *Controller) GetCategory() func(c *gin.Context) {
+func (cat *Category) GetCategory() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		request, requestErr := cont.Request.NewGetCategory(c)
+		request, requestErr := cat.request.NewGetCategory(c)
 
 		if requestErr != nil {
-			c.JSON(http.StatusBadRequest, cont.Response.NewError(requestErr))
+			c.JSON(http.StatusBadRequest, cat.response.NewError(requestErr))
 			return
 		}
 
-		category, categoryError := cont.Repository.Category.GetCategory(request.UserID, request.CategoryID)
+		category, categoryError := cat.repository.Category.FindByUserIDAndCategoryID(request.UserID, request.CategoryID)
 
 		if categoryError != nil {
-			c.JSON(http.StatusBadRequest, cont.Response.NewError(categoryError))
+			c.JSON(http.StatusBadRequest, cat.response.NewError(categoryError))
 			return
 		}
 
-		c.JSON(http.StatusOK, cont.Response.NewCategoryJokes(category))
+		c.JSON(http.StatusOK, cat.response.NewCategoryJokes(category))
 	}
 }

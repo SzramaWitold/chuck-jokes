@@ -1,19 +1,21 @@
 package requests
 
 import (
-	"github.com/gin-gonic/gin"
 	"log"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
-type PaginationRequest struct {
+type FindCollection struct {
 	Page    int
 	PerPage int
 }
 
-func (r *RequestValidator) NewPagination(c *gin.Context) PaginationRequest {
+func (r *RequestValidator) NewFindCollection(c *gin.Context) FindCollection {
 	page, perPage := getPaginationSetup(c)
-	return PaginationRequest{
+
+	return FindCollection{
 		Page:    page,
 		PerPage: perPage,
 	}
@@ -22,15 +24,14 @@ func (r *RequestValidator) NewPagination(c *gin.Context) PaginationRequest {
 func getPaginationSetup(c *gin.Context) (int, int) {
 	query := c.Request.URL.Query()
 	page, err := strconv.Atoi(query.Get("page"))
-
 	if err != nil {
 		log.Println("Wrong type provide as a page parameter")
 	}
 
 	perPage, err := strconv.Atoi(query.Get("per_page"))
-
 	if err != nil {
 		log.Println("Wrong type provide as a per_page parameter")
 	}
+
 	return page, perPage
 }

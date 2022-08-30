@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-// User base model
+// User base model.
 type User struct {
 	ID         uint
 	CreatedAt  time.Time

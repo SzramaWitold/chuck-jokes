@@ -12,12 +12,12 @@ import (
 // Server base gin server
 type Server struct {
 	Engine     *gin.Engine
-	Controller controllers.ControllerHandler
+	Controller *controllers.ControllerWrapper
 	Middleware *middlewares.Middleware
 }
 
 // StartEngine start gin engine, add routes and return server struct
-func StartEngine(controller *controllers.Controller, middleware *middlewares.Middleware) Server {
+func StartEngine(controller *controllers.ControllerWrapper, middleware *middlewares.Middleware) Server {
 	server := Server{
 		Engine:     gin.Default(),
 		Controller: controller,
@@ -25,5 +25,6 @@ func StartEngine(controller *controllers.Controller, middleware *middlewares.Mid
 	}
 	server.setRoutes()
 	server.Engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+
 	return server
 }

@@ -1,8 +1,9 @@
 package models
 
 import (
-	"chuck-jokes/models"
 	"log"
+
+	"chuck-jokes/models"
 
 	"gorm.io/gorm"
 )
@@ -17,8 +18,7 @@ type Joke struct {
 
 // Create save joke to database
 func Create(db *gorm.DB, joke *models.Joke) *models.Joke {
-	tx := db.Create(&joke)
-	if tx.Error != nil {
+	if tx := db.Create(&joke); tx.Error != nil {
 		log.Println(tx.Error)
 	}
 

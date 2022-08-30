@@ -10,7 +10,7 @@ type Token struct {
 	RefreshTTL *time.Time
 }
 
-func (r *Response) NewToken(token string, ttl, refreshTTL *time.Time) Token {
+func (r *DefaultResponseHandler) NewToken(token string, ttl, refreshTTL *time.Time) Token {
 	return Token{
 		Token:      token,
 		TTL:        ttl,

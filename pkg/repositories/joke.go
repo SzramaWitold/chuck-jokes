@@ -1,21 +1,23 @@
 package repositories
 
 import (
-	"chuck-jokes/models"
-	gormModels "chuck-jokes/pkg/database/gorm/models"
 	"log"
 	"time"
+
+	"chuck-jokes/models"
+	"chuck-jokes/pkg/api/controllers/requests"
+	gormModels "chuck-jokes/pkg/database/gorm/models"
 
 	"gorm.io/gorm"
 )
 
 type JokeRepository interface {
 	JokeOfTheDay(time string) *models.Joke
-	GetJoke(jokeID uint) *models.Joke
+	Find(jokeID uint) *models.Joke
 	GetStatistic(jokeID uint) (*models.Joke, uint)
-	GetJokes(page int, perPage int) *Pagination[models.Joke]
+	FindAll(request requests.FindCollection) *Pagination[models.Joke]
 	JokeExistInLastMonth(joke *models.Joke) bool
-	GetFavourites(page int, perPage int, userID uint) *Pagination[models.Joke]
+	FindFavourites(request requests.FindCollection, userID uint) *Pagination[models.Joke]
 }
 
 // Joke base joke repository
@@ -32,31 +34,32 @@ func NewJoke(db *gorm.DB) *Joke {
 
 // JokeOfTheDay get joke of the day from specify day
 func (j *Joke) JokeOfTheDay(time string) *models.Joke {
-	var joke = models.Joke{}
-	j.db.Where("created_at >= ?", time).First(&joke)
+	joke := models.Joke{}
 
-	if joke.ExternalID == "" {
+	if tx := j.db.Where("created_at >= ?", time).First(&joke); tx.Error != nil {
+		log.Println(tx.Error)
+
 		return nil
 	}
+
 	return &joke
 }
 
-// GetJoke get joke of the day from specyfi day
-func (j *Joke) GetJoke(jokeID uint) *models.Joke {
-	var joke = models.Joke{}
-	txFind := j.db.First(&joke, jokeID)
+// Find get joke of the day from specify day
+func (j *Joke) Find(jokeID uint) *models.Joke {
+	joke := models.Joke{}
 
-	if txFind.Error != nil {
+	if txFind := j.db.First(&joke, jokeID); txFind.Error != nil {
 		log.Println(txFind.Error)
+
 		return nil
 	}
 
 	joke.Shows++
 
-	txSave := j.db.Save(&joke)
-
-	if txSave.Error != nil {
+	if txSave := j.db.Save(&joke); txSave.Error != nil {
 		log.Println(txSave.Error)
+
 		return nil
 	}
 
@@ -65,11 +68,11 @@ func (j *Joke) GetJoke(jokeID uint) *models.Joke {
 
 // GetStatistic get statistic for joke
 func (j *Joke) GetStatistic(jokeID uint) (*models.Joke, uint) {
-	var joke = models.Joke{}
-	txFind := j.db.First(&joke, jokeID)
+	joke := models.Joke{}
 
-	if txFind.Error != nil {
+	if txFind := j.db.First(&joke, jokeID); txFind.Error != nil {
 		log.Println(txFind.Error)
+
 		return nil, 0
 	}
 
@@ -78,14 +81,16 @@ func (j *Joke) GetStatistic(jokeID uint) (*models.Joke, uint) {
 	return &joke, uint(favourites)
 }
 
-// GetJokes get all jokes
-func (j *Joke) GetJokes(page, perPage int) *Pagination[models.Joke] {
+// FindAll get all jokes
+func (j *Joke) FindAll(request requests.FindCollection) *Pagination[models.Joke] {
 	var totalRows int64
+
 	var jokes []models.Joke
-	var pagination = NewPagination[models.Joke]()
+
+	pagination := NewPagination[models.Joke]()
 
 	j.db.Model([]models.Joke{}).Count(&totalRows)
-	pagination.UpdateSettings(page, perPage)
+	pagination.UpdateSettings(request.Page, request.PerPage)
 	j.db.Scopes(paginate(pagination)).Find(&jokes)
 
 	return pagination.PopulateData(totalRows, jokes)
@@ -104,19 +109,29 @@ func (j *Joke) JokeExistInLastMonth(joke *models.Joke) bool {
 	return r.RowsAffected > 0
 }
 
-func (j *Joke) GetFavourites(page, perPage int, userID uint) *Pagination[models.Joke] {
-	var totalRows int64
-	var jokes []models.Joke
-	var pagination = NewPagination[models.Joke]()
-	var user = gormModels.User{}
+func (j *Joke) FindFavourites(request requests.FindCollection, userID uint) *Pagination[models.Joke] {
+	var (
+		totalRows  int64
+		jokes      []models.Joke
+		pagination = NewPagination[models.Joke]()
+		user       = gormModels.User{}
+	)
 
-	j.db.First(&user, userID)
+	if tx := j.db.First(&user, userID); tx.Error != nil {
+		log.Println(tx.Error)
+
+		return nil
+	}
 
 	totalRows = j.db.Model(&user).Association("Favourites").Count()
-	pagination.UpdateSettings(page, perPage)
+
+	pagination.UpdateSettings(request.Page, request.PerPage)
+
 	dbError := j.db.Model(&user).Scopes(paginate(pagination)).Association("Favourites").Find(&jokes)
+
 	if dbError != nil {
 		log.Println(dbError)
+
 		return nil
 	}
 
