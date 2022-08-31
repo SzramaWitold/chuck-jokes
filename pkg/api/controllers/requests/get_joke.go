@@ -11,7 +11,7 @@ type Joke struct {
 func (r *RequestValidator) NewJoke(c *gin.Context) (*Joke, error) {
 	var request Joke
 
-	jokeID, jokeIDErr := changeToUint(c.Param("ID"), "JokeID")
+	jokeID, jokeIDErr := changeToUint(c.Param("ID"))
 
 	if jokeIDErr != nil {
 		return nil, jokeIDErr

@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"golang.org/x/crypto/bcrypt"
+
 	"chuck-jokes/pkg/repositories/gorm"
 
 	"chuck-jokes/pkg/api/controllers/requests"
@@ -84,13 +86,22 @@ func (u *User) Login() func(c *gin.Context) {
 			return
 		}
 
-		user := u.repository.User.Authenticate(request.Username, request.Password)
-		if user != nil {
-			baseJwt := *u.jwt
-			c.JSON(http.StatusOK, u.response.NewToken(baseJwt.CreateToken(user)))
-		} else {
-			c.JSON(http.StatusUnauthorized, u.response.NewError(fmt.Errorf("wrong credentials")))
+		user, userErr := u.repository.User.Get(request.Username)
+
+		if userErr != nil || user == nil {
+			c.JSON(http.StatusUnauthorized, u.response.NewError(userErr))
+
+			return
 		}
+
+		if !checkPasswordHash(request.Password, user.Password) {
+			c.JSON(http.StatusUnauthorized, u.response.NewError(fmt.Errorf("wrong credentials")))
+
+			return
+		}
+
+		baseJwt := *u.jwt
+		c.JSON(http.StatusOK, u.response.NewToken(baseJwt.CreateToken(user)))
 	}
 }
 
@@ -116,7 +127,15 @@ func (u *User) Register() func(c *gin.Context) {
 			return
 		}
 
-		createUserError := u.repository.User.Register(request.Name, request.Username, request.Password)
+		hashPassword, hashPasswordErr := hashPassword(request.Password)
+
+		if hashPasswordErr != nil {
+			c.JSON(http.StatusBadRequest, u.response.NewError(hashPasswordErr))
+
+			return
+		}
+
+		createUserError := u.repository.User.Create(request.Name, request.Username, hashPassword)
 
 		if createUserError != nil {
 			c.JSON(http.StatusBadRequest, u.response.NewError(createUserError))
@@ -185,4 +204,16 @@ func (u *User) AddFavourite() func(c *gin.Context) {
 
 		c.JSON(http.StatusOK, u.response.NewSuccess("success"))
 	}
+}
+
+func hashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+
+	return string(bytes), err
+}
+
+func checkPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+
+	return err == nil
 }

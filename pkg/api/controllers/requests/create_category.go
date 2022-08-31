@@ -12,7 +12,7 @@ type CreateCategory struct {
 func (r *RequestValidator) NewCreateCategory(c *gin.Context) (*CreateCategory, error) {
 	var request CreateCategory
 
-	userID, userIDErr := changeToUint(c.Param("UserID"), "UserID")
+	userID, userIDErr := changeToUint(c.Param("UserID"))
 
 	if userIDErr != nil {
 		return nil, userIDErr

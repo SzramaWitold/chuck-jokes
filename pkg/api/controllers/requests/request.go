@@ -32,15 +32,15 @@ func NewRequestValidator(validator *validator.Validate) *RequestValidator {
 	}
 }
 
-func changeToUint(input, name string) (uint, error) {
+func changeToUint(input string) (uint, error) {
 	i, convErr := strconv.Atoi(input)
 
 	if convErr != nil {
-		return 0, fmt.Errorf("field '%v' should be of numeric type", name)
+		return 0, fmt.Errorf("field should be of numeric type")
 	}
 
 	if i <= 0 {
-		return 0, fmt.Errorf("field '%v' should be positive number", name)
+		return 0, fmt.Errorf("field should be positive number")
 	}
 
 	return uint(i), nil

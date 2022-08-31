@@ -12,7 +12,7 @@ type GetCategory struct {
 func (r *RequestValidator) NewGetCategory(c *gin.Context) (*GetCategory, error) {
 	var request GetCategory
 
-	userID, userIDErr := changeToUint(c.Param("UserID"), "UserID")
+	userID, userIDErr := changeToUint(c.Param("UserID"))
 
 	if userIDErr != nil {
 		return nil, userIDErr
@@ -20,7 +20,7 @@ func (r *RequestValidator) NewGetCategory(c *gin.Context) (*GetCategory, error) 
 		request.UserID = userID
 	}
 
-	categoryID, categoryIDErr := changeToUint(c.Param("ID"), "CategoryID")
+	categoryID, categoryIDErr := changeToUint(c.Param("ID"))
 
 	if categoryIDErr != nil {
 		return nil, categoryIDErr

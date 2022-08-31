@@ -12,7 +12,7 @@ type SetAccess struct {
 func (r *RequestValidator) NewSetAccess(c *gin.Context) (*SetAccess, error) {
 	var request SetAccess
 
-	categoryID, categoryIDErr := changeToUint(c.Param("ID"), "CategoryID")
+	categoryID, categoryIDErr := changeToUint(c.Param("ID"))
 
 	if categoryIDErr != nil {
 		return nil, categoryIDErr
@@ -20,7 +20,7 @@ func (r *RequestValidator) NewSetAccess(c *gin.Context) (*SetAccess, error) {
 		request.CategoryID = categoryID
 	}
 
-	userID, userIDErr := changeToUint(c.Param("UserID"), "UserID")
+	userID, userIDErr := changeToUint(c.Param("UserID"))
 
 	if userIDErr != nil {
 		return nil, userIDErr

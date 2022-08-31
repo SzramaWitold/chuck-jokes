@@ -563,7 +563,7 @@ const docTemplate = `{
                 "tags": [
                     "User"
                 ],
-                "summary": "Register",
+                "summary": "Create",
                 "parameters": [
                     {
                         "type": "string",

@@ -7,18 +7,17 @@ import (
 	"chuck-jokes/models"
 	gormModels "chuck-jokes/pkg/database/gorm/models"
 
-	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
 type UserRepository interface {
-	Register(name string, username string, password string) error
-	Authenticate(username string, password string) *models.User
+	Create(name string, username string, password string) error
+	Get(username string) (*models.User, error)
 	FindById(id int) *models.User
 	AddFavourite(userID uint, jokeID uint) error
 }
 
-// User base mapUser repository
+// User base user repository
 type User struct {
 	db *gorm.DB
 }
@@ -27,17 +26,11 @@ func NewUser(db *gorm.DB) *User {
 	return &User{db: db}
 }
 
-func (u *User) Register(name, username, password string) error {
-	hashPassword, hashPasswordErr := hashPassword(password)
-
-	if hashPasswordErr != nil {
-		return hashPasswordErr
-	}
-
+func (u *User) Create(name, username, password string) error {
 	user := gormModels.User{
 		Username: username,
 		Name:     name,
-		Password: hashPassword,
+		Password: password,
 	}
 
 	if tx := u.db.Create(&user); tx.Error != nil {
@@ -47,21 +40,15 @@ func (u *User) Register(name, username, password string) error {
 	return nil
 }
 
-// Authenticate get mapUser based on username and password
-func (u *User) Authenticate(username, password string) *models.User {
+// Get user based on username and password
+func (u *User) Get(username string) (*models.User, error) {
 	user := gormModels.User{}
 
 	if tx := u.db.Where("username = ?", username).First(&user); tx.Error != nil {
-		log.Println(tx.Error)
-
-		return nil
+		return nil, tx.Error
 	}
 
-	if !checkPasswordHash(password, user.Password) {
-		return nil
-	}
-
-	return mapUser(&user)
+	return mapUser(&user), nil
 }
 
 func (u *User) FindById(id int) *models.User {
@@ -97,16 +84,4 @@ func (u *User) AddFavourite(userID, jokeID uint) error {
 	}
 
 	return nil
-}
-
-func hashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-
-	return string(bytes), err
-}
-
-func checkPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-
-	return err == nil
 }

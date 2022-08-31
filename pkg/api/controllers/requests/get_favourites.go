@@ -12,7 +12,7 @@ type Favourites struct {
 func (r *RequestValidator) NewFavourites(c *gin.Context) (*Favourites, error) {
 	var request Favourites
 
-	userID, userIDErr := changeToUint(c.Param("UserID"), "UserID")
+	userID, userIDErr := changeToUint(c.Param("UserID"))
 
 	if userIDErr != nil {
 		return nil, userIDErr

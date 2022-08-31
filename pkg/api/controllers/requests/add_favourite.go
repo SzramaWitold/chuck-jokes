@@ -12,15 +12,15 @@ type AddFavourite struct {
 func (r *RequestValidator) NewAddFavouriteRequest(c *gin.Context) (*AddFavourite, error) {
 	var request AddFavourite
 
-	userID, userIDErr := changeToUint(c.Param("UserID"), "UserID")
+	userID, userIDErr := changeToUint(c.Param("UserID"))
 
 	if userIDErr != nil {
 		return nil, userIDErr
-	} else {
-		request.UserID = userID
 	}
 
-	jokeID, jokeIDErr := changeToUint(c.PostForm("JokeID"), "JokeID")
+	request.UserID = userID
+
+	jokeID, jokeIDErr := changeToUint(c.PostForm("JokeID"))
 	if jokeIDErr != nil {
 		return nil, jokeIDErr
 	} else {
