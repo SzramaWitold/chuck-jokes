@@ -6,6 +6,7 @@ func GetAllModels() []interface{} {
 	models = append(models, &Joke{})
 	models = append(models, &Category{})
 	models = append(models, &User{})
+	models = append(models, &JokeStatistic{})
 
 	return models
 }

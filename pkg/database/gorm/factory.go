@@ -1,22 +1,25 @@
 package gorm
 
 import (
-	"chuck-jokes/pkg/database/gorm/models"
-	"github.com/bxcodec/faker/v3"
-	"gorm.io/gorm"
+	"log"
 	"math/rand"
 	"time"
+
+	"chuck-jokes/models"
+	gormRepository "chuck-jokes/pkg/repositories/gorm"
+
+	"github.com/bxcodec/faker/v3"
 )
 
 // Factory base struct for create data inside database
 type Factory struct {
-	db *gorm.DB
+	repository *gormRepository.Repository
 }
 
 // NewFactory create new Factory
-func NewFactory(db *gorm.DB) *Factory {
+func NewFactory(repository *gormRepository.Repository) *Factory {
 	return &Factory{
-		db: db,
+		repository: repository,
 	}
 }
 
@@ -26,25 +29,29 @@ func (f *Factory) CreateJoke(addDays int) *models.Joke {
 	joke := models.Joke{
 		Value:      faker.Sentence(),
 		ExternalID: faker.UUIDHyphenated(),
-		Shows:      uint(rand.Intn(99-5) + 5),
 	}
 	joke.CreatedAt = time.Now().Add(24 * time.Duration(addDays) * time.Hour)
+	newJoke, createErr := f.repository.Joke.Create(&joke)
 
-	f.db.Create(&joke)
+	if createErr != nil {
+		log.Println(createErr)
 
-	return &joke
+		return nil
+	}
+
+	return newJoke
 }
 
 // CreateUser add fake User model to database
 func (f *Factory) CreateUser() *models.User {
-	user := models.User{}
-	user.Name = faker.Name()
-	user.Password = faker.Password()
-	user.Username = faker.Email()
+	user, createErr := f.repository.User.Create(faker.Name(), faker.Email(), faker.Password())
+	if createErr != nil {
+		log.Println(createErr)
 
-	f.db.Create(&user)
+		return nil
+	}
 
-	return &user
+	return user
 }
 
 // CreateCategory add fake User category model to database
@@ -53,13 +60,13 @@ func (f *Factory) CreateCategory(user *models.User, category *models.Category) *
 		panic("User required for category")
 	}
 
-	if category == nil {
-		category = new(models.Category)
-		category.Name = faker.Name()
-		category.UserID = user.ID
-	}
+	category, createErr := f.repository.Category.Create(user.ID, faker.Name())
 
-	f.db.Create(category)
+	if createErr != nil {
+		log.Println(createErr)
+
+		return nil
+	}
 
 	return category
 }

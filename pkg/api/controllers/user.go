@@ -135,7 +135,7 @@ func (u *User) Register() func(c *gin.Context) {
 			return
 		}
 
-		createUserError := u.repository.User.Create(request.Name, request.Username, hashPassword)
+		_, createUserError := u.repository.User.Create(request.Name, request.Username, hashPassword)
 
 		if createUserError != nil {
 			c.JSON(http.StatusBadRequest, u.response.NewError(createUserError))

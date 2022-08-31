@@ -18,7 +18,7 @@ type ResponseHandler interface {
 	NewPaginateJokes(repJokes *gorm.Pagination[models.Joke]) *Pagination[Joke]
 	NewSuccess(message string) Success
 	NewCategoryJokes(category *models.Category) CategoryJokes
-	NewJokeStatistic(joke *models.Joke, favAmount uint) JokeStatistic
+	NewJokeStatistic(joke *models.JokeStatistic, favAmount uint) JokeStatistic
 }
 type DefaultResponseHandler struct{}
 

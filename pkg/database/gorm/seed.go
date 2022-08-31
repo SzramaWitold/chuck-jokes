@@ -1,10 +1,10 @@
 package gorm
 
 import (
-	"chuck-jokes/pkg/database/gorm/models"
 	"log"
 
-	"gorm.io/gorm"
+	"chuck-jokes/models"
+	"chuck-jokes/pkg/repositories/gorm"
 )
 
 // Seeder base struct for initialize seed
@@ -13,9 +13,9 @@ type Seeder struct {
 }
 
 // NewSeeder create new gorm seeder
-func NewSeeder(gorm *gorm.DB) Seeder {
+func NewSeeder(repository *gorm.Repository) Seeder {
 	return Seeder{
-		factory: NewFactory(gorm),
+		factory: NewFactory(repository),
 	}
 }
 
@@ -49,6 +49,7 @@ func (s *Seeder) Seed() {
 	}
 	s.CreateJokes(jokeRequest)
 	users := s.CreateUsers(userRequest)
+
 	for _, user := range users {
 		categoryRequest := CategoryRequest{
 			user:   *user,
@@ -73,14 +74,19 @@ func (s *Seeder) CreateJokes(request JokeCreateRequest) []*models.Joke {
 // CreateUsers create with favourite jokes
 func (s *Seeder) CreateUsers(request UserCreateRequest) []*models.User {
 	users := make([]*models.User, request.amount)
+
 	for i := 0; i < request.amount; i++ {
 		user := s.factory.CreateUser()
+		users[i] = user
+
 		for j := 0; j < request.favourites; j++ {
 			joke := s.factory.CreateJoke(-1 * j)
-			user.Favourites = append(user.Favourites, *joke)
+			addFavErr := s.factory.repository.User.AddFavourite(user.ID, joke.ID)
+
+			if addFavErr != nil {
+				log.Println(addFavErr)
+			}
 		}
-		users[i] = user
-		s.factory.db.Save(&user)
 	}
 
 	return users
@@ -92,8 +98,11 @@ func (s *Seeder) CreateCategories(request CategoryRequest) {
 		category := s.factory.CreateCategory(&request.user, nil)
 		for j := 0; j < request.jokes; j++ {
 			joke := s.factory.CreateJoke(-1 * j)
-			category.Jokes = append(category.Jokes, *joke)
+			addToCategoryErr := s.factory.repository.Category.AddToCategory(category.UserID, category.ID, joke.ID)
+
+			if addToCategoryErr != nil {
+				log.Println(addToCategoryErr)
+			}
 		}
-		s.factory.db.Save(&category)
 	}
 }

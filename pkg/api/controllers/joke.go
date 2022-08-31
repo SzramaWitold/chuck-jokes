@@ -69,6 +69,12 @@ func (j *Joke) Get() func(c *gin.Context) {
 
 		repJoke := j.repository.Joke.Find(request.JokeID)
 
+		if addStatisticErr := j.repository.JokeStatistic.AddShowByJokeID(request.JokeID); addStatisticErr != nil {
+			c.JSON(http.StatusBadRequest, j.response.NewError(addStatisticErr))
+
+			return
+		}
+
 		c.JSON(http.StatusOK, j.response.NewJoke(repJoke))
 	}
 }
@@ -93,7 +99,13 @@ func (j *Joke) GetStatistic() func(c *gin.Context) {
 			return
 		}
 
-		repJoke, favNumber := j.repository.Joke.GetStatistic(request.JokeID)
+		repJoke, favNumber, jokeStatisticErr := j.repository.JokeStatistic.FindByJokeID(request.JokeID)
+
+		if jokeStatisticErr != nil {
+			c.JSON(http.StatusBadRequest, j.response.NewError(jokeStatisticErr))
+
+			return
+		}
 
 		c.JSON(http.StatusOK, j.response.NewJokeStatistic(repJoke, favNumber))
 	}

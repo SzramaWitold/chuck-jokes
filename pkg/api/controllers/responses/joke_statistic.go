@@ -1,8 +1,9 @@
 package responses
 
 import (
-	"chuck-jokes/models"
 	"time"
+
+	"chuck-jokes/models"
 )
 
 type JokeStatistic struct {
@@ -11,14 +12,16 @@ type JokeStatistic struct {
 	UpdatedAt time.Time
 	Favourite uint
 	Shows     uint
+	Joke      Joke
 }
 
-func (r *DefaultResponseHandler) NewJokeStatistic(joke *models.Joke, favAmount uint) JokeStatistic {
+func (r *DefaultResponseHandler) NewJokeStatistic(js *models.JokeStatistic, favAmount uint) JokeStatistic {
 	return JokeStatistic{
-		ID:        joke.ID,
-		CreatedAt: joke.CreatedAt,
-		UpdatedAt: joke.UpdatedAt,
-		Shows:     joke.Shows,
+		ID:        js.ID,
+		CreatedAt: js.CreatedAt,
+		UpdatedAt: js.UpdatedAt,
+		Shows:     js.Shows,
 		Favourite: favAmount,
+		Joke:      r.NewJoke(&js.Joke),
 	}
 }

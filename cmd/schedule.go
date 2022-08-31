@@ -6,7 +6,6 @@ import (
 
 	"chuck-jokes/di"
 	"chuck-jokes/models"
-	gormModels "chuck-jokes/pkg/database/gorm/models"
 	gormRepository "chuck-jokes/pkg/repositories/gorm"
 	"chuck-jokes/pkg/requests"
 
@@ -51,7 +50,9 @@ func scheduleRandomJoke(db *gorm.DB, external func() *models.Joke) func() {
 			return
 		}
 
-		gormModels.Create(db, joke)
+		if _, createErr := JokeRepository.Create(joke); createErr != nil {
+			log.Println(createErr)
+		}
 
 		log.Println("Random joke scheduler finished")
 	}

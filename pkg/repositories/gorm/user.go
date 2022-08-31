@@ -11,7 +11,7 @@ import (
 )
 
 type UserRepository interface {
-	Create(name string, username string, password string) error
+	Create(name string, username string, password string) (*models.User, error)
 	Get(username string) (*models.User, error)
 	FindById(id int) *models.User
 	AddFavourite(userID uint, jokeID uint) error
@@ -26,7 +26,7 @@ func NewUser(db *gorm.DB) *User {
 	return &User{db: db}
 }
 
-func (u *User) Create(name, username, password string) error {
+func (u *User) Create(name, username, password string) (*models.User, error) {
 	user := gormModels.User{
 		Username: username,
 		Name:     name,
@@ -34,10 +34,10 @@ func (u *User) Create(name, username, password string) error {
 	}
 
 	if tx := u.db.Create(&user); tx.Error != nil {
-		return tx.Error
+		return nil, tx.Error
 	}
 
-	return nil
+	return mapUser(&user), nil
 }
 
 // Get user based on username and password

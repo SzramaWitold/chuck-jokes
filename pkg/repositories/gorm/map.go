@@ -1,6 +1,8 @@
 package gorm
 
 import (
+	"time"
+
 	"chuck-jokes/models"
 	gormModel "chuck-jokes/pkg/database/gorm/models"
 )
@@ -10,7 +12,6 @@ func mapJoke(joke *gormModel.Joke) *models.Joke {
 		ID:         joke.ID,
 		CreatedAt:  joke.CreatedAt,
 		UpdatedAt:  joke.UpdatedAt,
-		Shows:      joke.Shows,
 		Value:      joke.Value,
 		ExternalID: joke.ExternalID,
 	}
@@ -20,6 +21,21 @@ func mapJoke(joke *gormModel.Joke) *models.Joke {
 	}
 
 	return &j
+}
+
+func mapJokeStatistic(statistic gormModel.JokeStatistic) *models.JokeStatistic {
+	js := models.JokeStatistic{
+		ID:        0,
+		CreatedAt: time.Time{},
+		UpdatedAt: time.Time{},
+		Shows:     0,
+		JokeID:    0,
+		Joke:      models.Joke{},
+	}
+
+	js.Joke = *mapJoke(&statistic.Joke)
+
+	return &js
 }
 
 func mapUser(user *gormModel.User) *models.User {

@@ -14,10 +14,10 @@ import (
 type JokeRepository interface {
 	JokeOfTheDay(time string) *models.Joke
 	Find(jokeID uint) *models.Joke
-	GetStatistic(jokeID uint) (*models.Joke, uint)
 	FindAll(request requests.FindCollection) *Pagination[models.Joke]
 	JokeExistInLastMonth(joke *models.Joke) bool
 	FindFavourites(request requests.FindCollection, userID uint) *Pagination[models.Joke]
+	Create(joke *models.Joke) (*models.Joke, error)
 }
 
 // Joke base mapJoke repository.
@@ -55,8 +55,6 @@ func (j *Joke) Find(jokeID uint) *models.Joke {
 		return nil
 	}
 
-	joke.Shows++
-
 	if txSave := j.db.Save(&joke); txSave.Error != nil {
 		log.Println(txSave.Error)
 
@@ -64,21 +62,6 @@ func (j *Joke) Find(jokeID uint) *models.Joke {
 	}
 
 	return mapJoke(&joke)
-}
-
-// GetStatistic get statistic for mapJoke.
-func (j *Joke) GetStatistic(jokeID uint) (*models.Joke, uint) {
-	joke := gormModels.Joke{}
-
-	if txFind := j.db.First(&joke, jokeID); txFind.Error != nil {
-		log.Println(txFind.Error)
-
-		return nil, 0
-	}
-
-	favourites := j.db.Model(&joke).Association("Users").Count()
-
-	return mapJoke(&joke), uint(favourites)
 }
 
 // FindAll get all jokes.
@@ -150,4 +133,25 @@ func (j *Joke) FindFavourites(request requests.FindCollection, userID uint) *Pag
 	}
 
 	return pagination.PopulateData(totalRows, baseJokes)
+}
+
+func (j *Joke) Create(joke *models.Joke) (*models.Joke, error) {
+	gormJoke := gormModels.Joke{
+		Value:      joke.Value,
+		ExternalID: joke.ExternalID,
+	}
+
+	gormJoke.CreatedAt = joke.CreatedAt
+	gormJoke.UpdatedAt = joke.UpdatedAt
+
+	if tx := j.db.Create(&gormJoke); tx.Error != nil {
+		return nil, tx.Error
+	}
+	jsRepository := NewJokeStatistic(j.db)
+
+	if err := jsRepository.Create(gormJoke.ID); err != nil {
+		return nil, err
+	}
+
+	return mapJoke(&gormJoke), nil
 }

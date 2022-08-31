@@ -3,6 +3,7 @@ package cmd
 import (
 	"chuck-jokes/di"
 	"chuck-jokes/pkg/database/gorm"
+	gormRepository "chuck-jokes/pkg/repositories/gorm"
 	"github.com/spf13/cobra"
 )
 
@@ -15,7 +16,8 @@ var seedCmd = &cobra.Command{
 	Short: "seed database with fake data",
 	Long:  `Seed data based on fake models from database`,
 	Run: func(_ *cobra.Command, _ []string) {
-		seeder := gorm.NewSeeder(di.GORM())
+		repository := gormRepository.NewRepository(di.GORM())
+		seeder := gorm.NewSeeder(repository)
 		seeder.Seed()
 	},
 }
