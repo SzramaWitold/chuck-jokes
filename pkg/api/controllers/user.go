@@ -5,9 +5,10 @@ import (
 	"net/http"
 	"strconv"
 
+	"chuck-jokes/pkg/repositories/gorm"
+
 	"chuck-jokes/pkg/api/controllers/requests"
 	"chuck-jokes/pkg/api/controllers/responses"
-	"chuck-jokes/pkg/repositories"
 	"chuck-jokes/pkg/token"
 
 	"github.com/gin-gonic/gin"
@@ -25,10 +26,10 @@ type User struct {
 	request    requests.RequestHandler
 	response   responses.ResponseHandler
 	jwt        *token.TokenHandler
-	repository *repositories.Repository
+	repository *gorm.Repository
 }
 
-func NewUser(request requests.RequestHandler, response responses.ResponseHandler, repository *repositories.Repository, JWT *token.TokenHandler) *User {
+func NewUser(request requests.RequestHandler, response responses.ResponseHandler, repository *gorm.Repository, JWT *token.TokenHandler) *User {
 	return &User{request: request, response: response, jwt: JWT, repository: repository}
 }
 

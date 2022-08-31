@@ -4,10 +4,11 @@ import (
 	"log"
 	"os"
 
+	gorm2 "chuck-jokes/pkg/repositories/gorm"
+
 	"chuck-jokes/di"
 	"chuck-jokes/models"
 	gormModels "chuck-jokes/pkg/database/gorm/models"
-	"chuck-jokes/pkg/repositories"
 	"chuck-jokes/pkg/requests"
 	"github.com/go-co-op/gocron"
 	"github.com/spf13/cobra"
@@ -41,7 +42,7 @@ func callSchedules(scheduler *gocron.Scheduler, db *gorm.DB) {
 
 func scheduleRandomJoke(db *gorm.DB, external func() *models.Joke) func() {
 	return func() {
-		JokeRepository := repositories.NewJoke(db)
+		JokeRepository := gorm2.NewJoke(db)
 		joke := external()
 
 		if JokeRepository.JokeExistInLastMonth(joke) {

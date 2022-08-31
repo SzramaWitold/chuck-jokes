@@ -3,9 +3,10 @@ package controllers
 import (
 	"net/http"
 
+	"chuck-jokes/pkg/repositories/gorm"
+
 	"chuck-jokes/pkg/api/controllers/requests"
 	"chuck-jokes/pkg/api/controllers/responses"
-	"chuck-jokes/pkg/repositories"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,10 +21,10 @@ type CategoryController interface {
 type Category struct {
 	request    requests.RequestHandler
 	response   responses.ResponseHandler
-	repository *repositories.Repository
+	repository *gorm.Repository
 }
 
-func NewCategory(request requests.RequestHandler, response responses.ResponseHandler, repository *repositories.Repository) CategoryController {
+func NewCategory(request requests.RequestHandler, response responses.ResponseHandler, repository *gorm.Repository) CategoryController {
 	return &Category{request: request, response: response, repository: repository}
 }
 
@@ -43,10 +44,18 @@ func (cat *Category) CreateCategory() func(c *gin.Context) {
 		request, requestErr := cat.request.NewCreateCategory(c)
 		if requestErr != nil {
 			c.JSON(http.StatusBadRequest, cat.response.NewError(requestErr))
+
 			return
 		}
 
-		category := cat.repository.Category.Create(request.UserID, request.Name)
+		category, databaseErr := cat.repository.Category.Create(request.UserID, request.Name)
+
+		if databaseErr != nil {
+			c.JSON(http.StatusBadRequest, cat.response.NewError(databaseErr))
+
+			return
+		}
+
 		c.JSON(http.StatusOK, cat.response.NewCategory(category))
 	}
 }

@@ -1,9 +1,10 @@
 package responses
 
 import (
-	"chuck-jokes/models"
-	"chuck-jokes/pkg/repositories"
 	"time"
+
+	"chuck-jokes/models"
+	"chuck-jokes/pkg/repositories/gorm"
 )
 
 type ResponseHandler interface {
@@ -14,7 +15,7 @@ type ResponseHandler interface {
 	NewErrorsCollection(errors []error) []Error
 	NewJoke(joke *models.Joke) Joke
 	NewJokeCollection(jokes []models.Joke) []Joke
-	NewPaginateJokes(repJokes *repositories.Pagination[models.Joke]) *Pagination[Joke]
+	NewPaginateJokes(repJokes *gorm.Pagination[models.Joke]) *Pagination[Joke]
 	NewSuccess(message string) Success
 	NewCategoryJokes(category *models.Category) CategoryJokes
 	NewJokeStatistic(joke *models.Joke, favAmount uint) JokeStatistic
@@ -38,6 +39,7 @@ func ResponsePagination[T interface{}](
 	perPage int,
 	totalRows int64,
 	totalPages int,
-	rows []T) *Pagination[T] {
+	rows []T,
+) *Pagination[T] {
 	return &Pagination[T]{Page: page, PerPage: perPage, TotalRows: totalRows, TotalPages: totalPages, Rows: rows}
 }

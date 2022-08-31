@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"net/http"
 
+	"chuck-jokes/pkg/repositories/gorm"
+
 	"chuck-jokes/pkg/api/controllers/requests"
 	"chuck-jokes/pkg/api/controllers/responses"
-	"chuck-jokes/pkg/repositories"
-
 	"chuck-jokes/pkg/utilities"
 
 	"github.com/gin-gonic/gin"
@@ -23,10 +23,10 @@ type JokeController interface {
 type Joke struct {
 	request    requests.RequestHandler
 	response   responses.ResponseHandler
-	repository *repositories.Repository
+	repository *gorm.Repository
 }
 
-func NewJoke(request requests.RequestHandler, response responses.ResponseHandler, repository *repositories.Repository) *Joke {
+func NewJoke(request requests.RequestHandler, response responses.ResponseHandler, repository *gorm.Repository) *Joke {
 	return &Joke{request: request, response: response, repository: repository}
 }
 

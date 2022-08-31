@@ -3,14 +3,14 @@ package cmd
 import (
 	"log"
 
+	gormRepository "chuck-jokes/pkg/repositories/gorm"
+
 	"chuck-jokes/di"
 	"chuck-jokes/pkg/api"
 	"chuck-jokes/pkg/api/controllers"
 	"chuck-jokes/pkg/api/controllers/requests"
 	"chuck-jokes/pkg/api/controllers/responses"
 	"chuck-jokes/pkg/api/middlewares"
-	"chuck-jokes/pkg/repositories"
-
 	"github.com/spf13/cobra"
 )
 
@@ -23,7 +23,7 @@ var rootCmd = &cobra.Command{
 		jwt := di.JWT()
 		request := requests.NewRequestValidator(di.Validator())
 		response := responses.NewDefaultResponseHandler()
-		repository := repositories.NewRepository(gorm)
+		repository := gormRepository.NewRepository(gorm)
 		controller := controllers.NewControllerWrapper(jwt, request, response, repository)
 		middleware := middlewares.NewMiddleware(jwt)
 

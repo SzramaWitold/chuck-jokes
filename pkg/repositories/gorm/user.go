@@ -1,4 +1,4 @@
-package repositories
+package gorm
 
 import (
 	"fmt"
@@ -18,7 +18,7 @@ type UserRepository interface {
 	AddFavourite(userID uint, jokeID uint) error
 }
 
-// User base user repository
+// User base mapUser repository
 type User struct {
 	db *gorm.DB
 }
@@ -47,9 +47,9 @@ func (u *User) Register(name, username, password string) error {
 	return nil
 }
 
-// Authenticate get user based on username and password
+// Authenticate get mapUser based on username and password
 func (u *User) Authenticate(username, password string) *models.User {
-	user := models.User{}
+	user := gormModels.User{}
 
 	if tx := u.db.Where("username = ?", username).First(&user); tx.Error != nil {
 		log.Println(tx.Error)
@@ -61,11 +61,11 @@ func (u *User) Authenticate(username, password string) *models.User {
 		return nil
 	}
 
-	return &user
+	return mapUser(&user)
 }
 
 func (u *User) FindById(id int) *models.User {
-	user := models.User{}
+	user := gormModels.User{}
 
 	if tx := u.db.Where("ID = ?", id).First(&user); tx.Error != nil {
 		log.Println(tx.Error)
@@ -73,12 +73,12 @@ func (u *User) FindById(id int) *models.User {
 		return nil
 	}
 
-	return &user
+	return mapUser(&user)
 }
 
 func (u *User) AddFavourite(userID, jokeID uint) error {
-	joke := models.Joke{}
-	user := models.User{}
+	joke := gormModels.Joke{}
+	user := gormModels.User{}
 
 	if userTx := u.db.First(&user, userID); userTx.Error != nil {
 		log.Println(userTx.Error)
@@ -89,7 +89,7 @@ func (u *User) AddFavourite(userID, jokeID uint) error {
 	if jokeTx := u.db.First(&joke, jokeID); jokeTx.Error != nil {
 		log.Println(jokeTx.Error)
 
-		return fmt.Errorf("joke with provided id: %v not exist", jokeID)
+		return fmt.Errorf("mapJoke with provided id: %v not exist", jokeID)
 	}
 
 	if updateError := u.db.Model(&user).Association("Favourites").Append(&joke); updateError != nil {

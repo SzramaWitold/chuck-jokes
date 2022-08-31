@@ -6,7 +6,7 @@ import "gorm.io/gorm"
 type User struct {
 	gorm.Model
 	Name       string     `faker:"name"`
-	Username   string     `gorm:"index:idx_username" faker:"email,unique"`
+	Username   string     `gorm:"index:idx_username, unique" faker:"email,unique"`
 	Password   string     `faker:"password"`
 	Favourites []Joke     `gorm:"many2many:jokes_users;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Categories []Category `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`

@@ -3,7 +3,7 @@ package controllers
 import (
 	"chuck-jokes/pkg/api/controllers/requests"
 	"chuck-jokes/pkg/api/controllers/responses"
-	"chuck-jokes/pkg/repositories"
+	"chuck-jokes/pkg/repositories/gorm"
 	"chuck-jokes/pkg/token"
 )
 
@@ -17,7 +17,7 @@ func NewControllerWrapper(
 	jwt *token.TokenHandler,
 	request requests.RequestHandler,
 	response responses.ResponseHandler,
-	repository *repositories.Repository,
+	repository *gorm.Repository,
 ) *ControllerWrapper {
 	return &ControllerWrapper{
 		Category: NewCategory(request, response, repository),

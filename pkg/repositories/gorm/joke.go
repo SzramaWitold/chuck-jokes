@@ -1,4 +1,4 @@
-package repositories
+package gorm
 
 import (
 	"log"
@@ -20,21 +20,21 @@ type JokeRepository interface {
 	FindFavourites(request requests.FindCollection, userID uint) *Pagination[models.Joke]
 }
 
-// Joke base joke repository
+// Joke base mapJoke repository.
 type Joke struct {
 	db *gorm.DB
 }
 
-// NewJoke create new joke repository
+// NewJoke create new mapJoke repository.
 func NewJoke(db *gorm.DB) *Joke {
 	return &Joke{
 		db: db,
 	}
 }
 
-// JokeOfTheDay get joke of the day from specify day
+// JokeOfTheDay get mapJoke of the day from specify day.
 func (j *Joke) JokeOfTheDay(time string) *models.Joke {
-	joke := models.Joke{}
+	joke := gormModels.Joke{}
 
 	if tx := j.db.Where("created_at >= ?", time).First(&joke); tx.Error != nil {
 		log.Println(tx.Error)
@@ -42,12 +42,12 @@ func (j *Joke) JokeOfTheDay(time string) *models.Joke {
 		return nil
 	}
 
-	return &joke
+	return mapJoke(&joke)
 }
 
-// Find get joke of the day from specify day
+// Find get mapJoke of the day from specify day.
 func (j *Joke) Find(jokeID uint) *models.Joke {
-	joke := models.Joke{}
+	joke := gormModels.Joke{}
 
 	if txFind := j.db.First(&joke, jokeID); txFind.Error != nil {
 		log.Println(txFind.Error)
@@ -63,12 +63,12 @@ func (j *Joke) Find(jokeID uint) *models.Joke {
 		return nil
 	}
 
-	return &joke
+	return mapJoke(&joke)
 }
 
-// GetStatistic get statistic for joke
+// GetStatistic get statistic for mapJoke.
 func (j *Joke) GetStatistic(jokeID uint) (*models.Joke, uint) {
-	joke := models.Joke{}
+	joke := gormModels.Joke{}
 
 	if txFind := j.db.First(&joke, jokeID); txFind.Error != nil {
 		log.Println(txFind.Error)
@@ -78,25 +78,32 @@ func (j *Joke) GetStatistic(jokeID uint) (*models.Joke, uint) {
 
 	favourites := j.db.Model(&joke).Association("Users").Count()
 
-	return &joke, uint(favourites)
+	return mapJoke(&joke), uint(favourites)
 }
 
-// FindAll get all jokes
+// FindAll get all jokes.
 func (j *Joke) FindAll(request requests.FindCollection) *Pagination[models.Joke] {
 	var totalRows int64
 
-	var jokes []models.Joke
+	var jokes []gormModels.Joke
 
 	pagination := NewPagination[models.Joke]()
 
-	j.db.Model([]models.Joke{}).Count(&totalRows)
+	j.db.Model([]gormModels.Joke{}).Count(&totalRows)
 	pagination.UpdateSettings(request.Page, request.PerPage)
 	j.db.Scopes(paginate(pagination)).Find(&jokes)
 
-	return pagination.PopulateData(totalRows, jokes)
+	baseJokes := make([]models.Joke, 0, len(jokes))
+
+	for _, joke := range jokes {
+		baseJoke := mapJoke(&joke)
+		baseJokes = append(baseJokes, *baseJoke)
+	}
+
+	return pagination.PopulateData(totalRows, baseJokes)
 }
 
-// JokeExistInLastMonth check if same joke exist in database ,and it is newer then month
+// JokeExistInLastMonth check if same mapJoke exist in database ,and it is in current month.
 func (j *Joke) JokeExistInLastMonth(joke *models.Joke) bool {
 	monthEarlier := time.Now().AddDate(0, -1, 0)
 
@@ -112,7 +119,7 @@ func (j *Joke) JokeExistInLastMonth(joke *models.Joke) bool {
 func (j *Joke) FindFavourites(request requests.FindCollection, userID uint) *Pagination[models.Joke] {
 	var (
 		totalRows  int64
-		jokes      []models.Joke
+		jokes      []gormModels.Joke
 		pagination = NewPagination[models.Joke]()
 		user       = gormModels.User{}
 	)
@@ -135,5 +142,12 @@ func (j *Joke) FindFavourites(request requests.FindCollection, userID uint) *Pag
 		return nil
 	}
 
-	return pagination.PopulateData(totalRows, jokes)
+	baseJokes := make([]models.Joke, 0, len(jokes))
+
+	for _, joke := range jokes {
+		baseJoke := mapJoke(&joke)
+		baseJokes = append(baseJokes, *baseJoke)
+	}
+
+	return pagination.PopulateData(totalRows, baseJokes)
 }

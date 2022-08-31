@@ -1,4 +1,4 @@
-package repositories
+package gorm
 
 import (
 	"fmt"
@@ -6,12 +6,13 @@ import (
 	"time"
 
 	"chuck-jokes/models"
+	gormModel "chuck-jokes/pkg/database/gorm/models"
 
 	"gorm.io/gorm"
 )
 
 type CategoryRepository interface {
-	Create(userID uint, name string) *models.Category
+	Create(userID uint, name string) (*models.Category, error)
 	AddToCategory(userId uint, categoryID uint, jokeID uint) error
 	UpdateAccess(userId uint, categoryID uint) error
 	FindByUserIDAndCategoryID(userId uint, categoryID uint) (*models.Category, error)
@@ -25,19 +26,19 @@ func NewCategory(db *gorm.DB) *Category {
 	return &Category{db: db}
 }
 
-func (c *Category) Create(userID uint, name string) *models.Category {
-	category := models.Category{
+func (c *Category) Create(userID uint, name string) (*models.Category, error) {
+	cat := gormModel.Category{
 		UserID: userID,
 		Name:   name,
 	}
 
-	if tx := c.db.Create(&category); tx.Error != nil {
+	if tx := c.db.Create(&cat); tx.Error != nil {
 		log.Println(tx.Error)
 
-		return nil
+		return nil, tx.Error
 	}
 
-	return &category
+	return mapCategory(&cat), nil
 }
 
 func (c *Category) AddToCategory(userId, categoryID, jokeID uint) error {
@@ -47,7 +48,7 @@ func (c *Category) AddToCategory(userId, categoryID, jokeID uint) error {
 		return categoryError
 	}
 
-	joke := models.Joke{}
+	joke := gormModel.Joke{}
 
 	if tx := c.db.First(&joke, jokeID); tx.Error != nil {
 		return tx.Error
@@ -80,32 +81,32 @@ func (c *Category) UpdateAccess(userId, categoryID uint) error {
 }
 
 func (c *Category) FindByUserIDAndCategoryID(userId, categoryID uint) (*models.Category, error) {
-	category := models.Category{}
+	cat := gormModel.Category{}
 
-	if tx := c.db.Preload("Jokes").First(&category, categoryID); tx.Error != nil {
+	if tx := c.db.Preload("Jokes").First(&cat, categoryID); tx.Error != nil {
 		return nil, tx.Error
 	}
 
-	if time.Now().Before(*category.Access) {
-		return &category, nil
+	if time.Now().Before(*cat.Access) {
+		return mapCategory(&cat), nil
 	}
 
 	if userId != 0 {
-		return &category, nil
+		return mapCategory(&cat), nil
 	}
 
-	return nil, fmt.Errorf("do not have permission to get this category")
+	return nil, fmt.Errorf("do not have permission to get this cat")
 }
 
-func getUserCategory(userId, categoryID uint, db *gorm.DB) (*models.Category, error) {
-	category := models.Category{}
+func getUserCategory(userId, categoryID uint, db *gorm.DB) (*gormModel.Category, error) {
+	category := gormModel.Category{}
 
 	if tx := db.First(&category, categoryID); tx.Error != nil {
 		return nil, tx.Error
 	}
 
 	if category.UserID != userId {
-		return nil, fmt.Errorf("do not have permission to add joke to this category")
+		return nil, fmt.Errorf("do not have permission to add mapJoke to this mapCategory")
 	}
 
 	return &category, nil

@@ -1,9 +1,10 @@
 package responses
 
 import (
-	"chuck-jokes/models"
-	"chuck-jokes/pkg/repositories"
 	"time"
+
+	"chuck-jokes/models"
+	"chuck-jokes/pkg/repositories/gorm"
 )
 
 type Joke struct {
@@ -42,7 +43,8 @@ func (r *DefaultResponseHandler) NewJokeCollection(jokes []models.Joke) []Joke {
 }
 
 func (r *DefaultResponseHandler) NewPaginateJokes(
-	repJokes *repositories.Pagination[models.Joke]) *Pagination[Joke] {
+	repJokes *gorm.Pagination[models.Joke],
+) *Pagination[Joke] {
 	return ResponsePagination[Joke](
 		repJokes.Page,
 		repJokes.PerPage,

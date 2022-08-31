@@ -11,5 +11,5 @@ type Joke struct {
 	Shows      uint
 	Value      string
 	ExternalID string
-	Users      []User `gorm:"many2many:jokes_users;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Users      []User
 }

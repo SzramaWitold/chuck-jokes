@@ -14,6 +14,7 @@ type Joke struct {
 	Value      string `faker:"sentence"`
 	ExternalID string `gorm:"unique" faker:"unique"`
 	Shows      uint   `gorm:"default:0"`
+	Users      []User `gorm:"many2many:jokes_users;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 // Create save joke to database
