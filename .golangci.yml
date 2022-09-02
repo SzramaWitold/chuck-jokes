@@ -1,0 +1,52 @@
+linters:
+  enable-all: true
+  fast: true
+  disable:
+    - gochecknoglobals
+    - godox
+    - gomnd
+    - goerr113
+    - testpackage
+    - exhaustivestruct
+    - exhaustive
+    - paralleltest
+    - nonamedreturns
+
+service:
+  golangci-lint-version: 1.39
+
+linters-settings:
+  misspell:
+    locale: US,GB
+  lll:
+    line-length: 200
+  funlen:
+    lines: 200
+    statements: 80
+  govet:
+    # report about shadowed variables
+    check-shadowing: true
+  maligned:
+    # print struct with more effective memory layout or not, false by default
+    suggest-new: true
+  dupl:
+    threshold: 200
+gocritic:
+  enabled-tags:
+    - diagnostic
+    - experimental
+    - opinionated
+    - performance
+    - style
+
+issues:
+  exclude-rules:
+    - path: cmd/
+      linters:
+        - gochecknoinits
+        - gocognit
+        - funlen
+    - path: ".*_test.go"
+      linters:
+        - funlen
+        - gocognit

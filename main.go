@@ -1,20 +1,20 @@
 package main
 
 import (
-	"chuck-jokes/api"
+	"chuck-jokes/cmd"
+	"github.com/joho/godotenv"
 )
 
-// Plan to GO
-// Get random joke from external api
-// Add dockerize database
-// Save jokes to database with current date
-// Authorize user
-// Many to Many users-jokes
-// Many to many categorie
-// Create seeders
-//
+// @title           Chuck jokes api doc
+// @version         1.0
+// @description     Chuck jokes manage api
 
+// @host      localhost:8080
+// @BasePath  /
 func main() {
-	server := api.StartEngine()
-	server.Engine.Run(":8080")
+	if err := godotenv.Load(); err != nil {
+		panic(err)
+	}
+
+	cmd.Execute()
 }
