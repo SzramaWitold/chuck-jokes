@@ -9,7 +9,7 @@ import (
 	"chuck-jokes/models"
 )
 
-type ExternalRequestor interface {
+type ExternalRequester interface {
 	CallRandom() *models.Joke
 }
 
@@ -18,7 +18,7 @@ type ExternalRequest struct {
 	client HTTPClient
 }
 
-func NewExternalRequest(random string, client HTTPClient) ExternalRequestor {
+func NewExternalRequest(random string, client HTTPClient) ExternalRequester {
 	return &ExternalRequest{
 		random: random,
 		client: client,
