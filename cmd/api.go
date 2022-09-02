@@ -3,14 +3,14 @@ package cmd
 import (
 	"log"
 
-	gormRepository "chuck-jokes/pkg/repositories/gorm"
-
 	"chuck-jokes/di"
 	"chuck-jokes/pkg/api"
 	"chuck-jokes/pkg/api/controllers"
 	"chuck-jokes/pkg/api/controllers/requests"
 	"chuck-jokes/pkg/api/controllers/responses"
 	"chuck-jokes/pkg/api/middlewares"
+	gormRepository "chuck-jokes/pkg/repositories/gorm"
+
 	"github.com/spf13/cobra"
 )
 

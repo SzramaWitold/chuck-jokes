@@ -4,12 +4,12 @@ import (
 	"time"
 )
 
-// GetToday get today's date at midnight
+// GetToday get today's date at midnight.
 func GetToday() time.Time {
 	return getDay(time.Now())
 }
 
-// GetYesterday get yesterdays date at midnight
+// GetYesterday get yesterdays date at midnight.
 func GetYesterday() time.Time {
 	return getDay(time.Now().Add(-24 * time.Hour))
 }

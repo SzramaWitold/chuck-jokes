@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"log"
+	"net/http"
 	"os"
 
 	"chuck-jokes/di"
@@ -31,7 +32,7 @@ var schedulerCmd = &cobra.Command{
 }
 
 func callSchedules(scheduler *gocron.Scheduler, db *gorm.DB) {
-	external := requests.NewExternalRequest(os.Getenv("EXTERNAL_API") + "jokes/random")
+	external := requests.NewExternalRequest(os.Getenv("EXTERNAL_API")+"jokes/random", http.DefaultClient)
 	_, sRanJokeErr := scheduler.Every(1).Minute().Do(scheduleRandomJoke(db, external.CallRandom))
 
 	if sRanJokeErr != nil {

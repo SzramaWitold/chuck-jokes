@@ -1,23 +1,32 @@
 package requests
 
 import (
-	"chuck-jokes/models"
 	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
+
+	"chuck-jokes/models"
 )
 
-type IExternalRequest interface {
+type ExternalRequestor interface {
 	CallRandom() *models.Joke
 }
 
 type ExternalRequest struct {
-	Random string
+	random string
+	client HTTPClient
 }
 
-func NewExternalRequest(random string) IExternalRequest {
-	return &ExternalRequest{Random: random}
+func NewExternalRequest(random string, client HTTPClient) ExternalRequestor {
+	return &ExternalRequest{
+		random: random,
+		client: client,
+	}
+}
+
+type HTTPClient interface {
+	Do(req *http.Request) (*http.Response, error)
 }
 
 // Joke for call from external api
@@ -35,10 +44,19 @@ func (j *Joke) ChangeToBaseModel() *models.Joke {
 
 // CallRandom Call random joke from external api
 func (e ExternalRequest) CallRandom() *models.Joke {
-	response, responseError := http.Get(e.Random)
 	var joke Joke
-	if responseError != nil {
-		log.Println(responseError)
+	request, requestError := http.NewRequest(http.MethodGet, e.random, nil)
+
+	if requestError != nil {
+		log.Println(requestError)
+	}
+
+	response, responseErr := e.client.Do(request)
+
+	if responseErr != nil {
+		log.Println(responseErr)
+
+		return nil
 	}
 
 	body, readBodyError := ioutil.ReadAll(response.Body)

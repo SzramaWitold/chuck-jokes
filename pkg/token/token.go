@@ -1,12 +1,14 @@
 package token
 
 import (
-	"chuck-jokes/models"
 	"fmt"
-	"github.com/golang-jwt/jwt/v4"
 	"log"
 	"strconv"
 	"time"
+
+	"chuck-jokes/models"
+
+	"github.com/golang-jwt/jwt/v4"
 )
 
 type TokenHandler interface {
@@ -60,6 +62,8 @@ func (h Handler) ValidateToken(tokenString string) (*jwt.Token, error) {
 
 	if tokenErr != nil {
 		log.Println(tokenErr)
+		log.Println("Token is not nil", tokenErr != nil)
+		return nil, tokenErr
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok {

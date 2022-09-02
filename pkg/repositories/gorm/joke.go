@@ -79,7 +79,8 @@ func (j *Joke) FindAll(request requests.FindCollection) *Pagination[models.Joke]
 	baseJokes := make([]models.Joke, 0, len(jokes))
 
 	for _, joke := range jokes {
-		baseJoke := mapJoke(&joke)
+		j := joke
+		baseJoke := mapJoke(&j)
 		baseJokes = append(baseJokes, *baseJoke)
 	}
 
@@ -128,7 +129,8 @@ func (j *Joke) FindFavourites(request requests.FindCollection, userID uint) *Pag
 	baseJokes := make([]models.Joke, 0, len(jokes))
 
 	for _, joke := range jokes {
-		baseJoke := mapJoke(&joke)
+		j := joke
+		baseJoke := mapJoke(&j)
 		baseJokes = append(baseJokes, *baseJoke)
 	}
 
@@ -147,6 +149,7 @@ func (j *Joke) Create(joke *models.Joke) (*models.Joke, error) {
 	if tx := j.db.Create(&gormJoke); tx.Error != nil {
 		return nil, tx.Error
 	}
+
 	jsRepository := NewJokeStatistic(j.db)
 
 	if err := jsRepository.Create(gormJoke.ID); err != nil {

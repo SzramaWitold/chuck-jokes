@@ -1,4 +1,5 @@
 .env
 mysql
+_mysql
 /.idea
 /.vscode
